@@ -1,9 +1,9 @@
 # CIS6003 Advanced Programming — Assignment Report
 
 **Assessment:** Online Vehicle Reservation System (WRIT1) | **Weighting:** 100%
-**Student ID:** *[insert your student ID here before submission]*
-**Submission title format:** `st<yourID> CIS6003 WRIT1`
-**GitHub repository:** *[paste your repository URL here after completing `docs/GIT_WORKFLOW.md`]*
+**Student:** BSc SE – CIS-6003 – 20374265
+**Submission title format:** `st20374265 CIS6003 WRIT1`
+**GitHub repository:** https://github.com/TharusanK23/vehicle-reservation-system
 
 > **Formatting note for submission:** this report is authored in Markdown as the
 > single source of truth for its content. Before submitting, paste it into

@@ -19,14 +19,12 @@ They take about two minutes.
 ```bash
 cd VehicleReservationSystem
 
-# 1. Create a new, empty PUBLIC repository on https://github.com/new
-#    (do NOT initialise it with a README/license - this project already has one)
-
-# 2. Point your local repo at it and push everything, including history:
-git remote add origin https://github.com/<your-username>/vehicle-reservation-system.git
+git remote add origin https://github.com/TharusanK23/vehicle-reservation-system.git
 git branch -M main
 git push -u origin main
 ```
+
+Repository: **https://github.com/TharusanK23/vehicle-reservation-system**
 
 GitHub Actions will run automatically on this first push — check the **Actions**
 tab of your repository; you should see the `Backend CI` workflow run and pass.
