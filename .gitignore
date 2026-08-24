@@ -1,0 +1,29 @@
+# Java / Maven
+backend/target/
+backend/backend-run.log
+*.class
+*.jar
+!backend/.mvn/wrapper/maven-wrapper.jar
+hs_err_pid*
+
+# PlantUML jar is a build tool, not source - re-download per diagrams/README.md instead of committing 22MB.
+diagrams/tools/
+
+# IDE
+.idea/
+*.iml
+.vscode/
+.classpath
+.project
+.settings/
+
+# Logs
+*.log
+backend/logs/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment specific
+.env
