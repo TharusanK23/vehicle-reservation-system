@@ -278,21 +278,35 @@ run.
 
 ## 9. Troubleshooting common errors
 
-### 9.1 `mysqld` won't start / phpMyAdmin shows connection errors / PHP warnings about missing extensions
+### 9.1 `mysqld`/Apache won't start / phpMyAdmin shows connection errors / PHP warnings about missing extensions
 
 **Cause:** if your XAMPP folder was moved or copied from its original install
 location (commonly `C:\xampp` or `...\Program Files\xampp`) to a new path
-without running XAMPP's path-fixer, `mysql\bin\my.ini` (and `php\php.ini`)
-still contain the **old, hard-coded absolute paths** — this was encountered and
-fixed during this project's own setup (the install had been moved to
-`F:\Program\xampp` while `mysql\bin\my.ini` still referenced
-`F:\Program Files\xampp\...`).
+without running XAMPP's path-fixer, several config files still contain the
+**old, hard-coded absolute paths** — this was encountered and fixed during
+this project's own setup, where XAMPP had been moved to `F:\Program\xampp`
+while its configs still referenced `F:\Program Files\xampp\...`. Four files
+were affected and fixed the same way:
 
-**Fix:** open `<xampp>\mysql\bin\my.ini` and correct the `socket=`, `basedir=`,
-`tmpdir=`, `datadir=`, `plugin_dir=`, `innodb_data_home_dir=` and
-`innodb_log_group_home_dir=` lines so they point at your **actual** XAMPP
-folder, then restart MySQL. (PHP/phpMyAdmin is not required by this project —
-you can safely skip fixing `php.ini` and use Option B in §2.2 instead.)
+| File | Symptom if unfixed |
+|---|---|
+| `mysql\bin\my.ini` | `mysqld` fails to start at all (no error log even created) |
+| `apache\conf\httpd.conf` | `httpd.exe: ... ServerRoot must be a valid directory` |
+| `apache\conf\extra\httpd-xampp.conf` | Apache fails to load the PHP module (`LoadFile`/`LoadModule` paths) |
+| `php\php.ini` | `PHP Fatal error: Unable to start standard module`; phpMyAdmin/Apache-hosted PHP breaks |
+
+**Fix:** in each file, find every absolute path containing the *old* XAMPP
+location and replace it with your **actual** install folder (a simple
+find-and-replace across the file is sufficient — e.g. `socket=`, `basedir=`,
+`datadir=` in `my.ini`; `ServerRoot`/`DocumentRoot` in `httpd.conf`;
+`LoadFile`/`LoadModule`/`PHPINIDir` in `httpd-xampp.conf`; `extension_dir=`,
+`error_log=`, `session.save_path=` etc. in `php.ini`), then restart the
+affected service(s) from the XAMPP Control Panel. Since this project's
+backend talks to MySQL directly and the frontend is plain static files, you
+only strictly need the `my.ini` fix to run this system — the Apache/PHP fixes
+are only needed if you want to serve the frontend through XAMPP's Apache
+(§4 Option A) or use phpMyAdmin; Option B (a plain static file server) and
+Option B of §2.2 (the `mysql.exe` CLI import) avoid Apache/PHP entirely.
 
 ### 9.2 Backend fails to start with a MySQL connection error
 
