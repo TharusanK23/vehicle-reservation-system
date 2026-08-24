@@ -1,0 +1,87 @@
+%% Online Vehicle Reservation System - Entity Relationship Diagram
+erDiagram
+    USERS {
+        bigint id PK
+        varchar username UK
+        varchar password
+        varchar full_name
+        varchar email
+        varchar role
+        tinyint enabled
+        datetime created_at
+    }
+
+    CUSTOMERS {
+        bigint id PK
+        varchar full_name
+        varchar address
+        varchar contact_number
+        varchar email
+        varchar license_number
+        datetime created_at
+    }
+
+    VEHICLE_CATEGORIES {
+        bigint id PK
+        varchar category_name UK
+        decimal daily_rate
+        varchar description
+    }
+
+    VEHICLES {
+        bigint id PK
+        varchar registration_number UK
+        varchar make
+        varchar model
+        int manufacture_year
+        bigint category_id FK
+        varchar status
+        varchar image_url
+    }
+
+    RESERVATIONS {
+        bigint id PK
+        varchar reservation_number UK
+        bigint customer_id FK
+        bigint vehicle_id FK
+        date pickup_date
+        time pickup_time
+        date return_date
+        time return_time
+        varchar status
+        varchar notes
+        bigint created_by FK
+        datetime created_at
+    }
+
+    BILLS {
+        bigint id PK
+        varchar bill_number UK
+        bigint reservation_id FK
+        int number_of_days
+        decimal daily_rate
+        decimal subtotal
+        decimal surcharge_amount
+        decimal discount_amount
+        decimal tax_amount
+        decimal total_amount
+        varchar pricing_strategy
+        varchar payment_status
+        varchar payment_method
+        datetime generated_at
+    }
+
+    NOTIFICATION_LOGS {
+        bigint id PK
+        varchar reservation_number
+        varchar channel
+        varchar message
+        datetime sent_at
+    }
+
+    VEHICLE_CATEGORIES ||--o{ VEHICLES : classifies
+    CUSTOMERS ||--o{ RESERVATIONS : books
+    VEHICLES ||--o{ RESERVATIONS : "is reserved in"
+    USERS ||--o{ RESERVATIONS : "creates (created_by)"
+    RESERVATIONS ||--o| BILLS : generates
+    RESERVATIONS |o..o{ NOTIFICATION_LOGS : "raises (by reservation_number)"

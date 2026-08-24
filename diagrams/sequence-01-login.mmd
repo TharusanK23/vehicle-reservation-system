@@ -1,0 +1,36 @@
+%% Sequence Diagram 1 - User Authentication (Login)
+sequenceDiagram
+    actor Staff as Staff Member
+    participant UI as Login Page<br/>(index.html / api.js)
+    participant Ctrl as AuthController
+    participant AuthMgr as AuthenticationManager
+    participant UDS as CustomUserDetailsService
+    participant Repo as UserRepository
+    participant DB as MySQL (users table)
+    participant Jwt as JwtService
+
+    Staff->>UI: enter username & password, click "Sign In"
+    UI->>Ctrl: POST /api/auth/login {username, password}
+    Ctrl->>AuthMgr: authenticate(UsernamePasswordAuthenticationToken)
+    AuthMgr->>UDS: loadUserByUsername(username)
+    UDS->>Repo: findByUsername(username)
+    Repo->>DB: SELECT * FROM users WHERE username = ?
+    DB-->>Repo: user row
+    Repo-->>UDS: Optional~User~
+    UDS-->>AuthMgr: UserDetails (BCrypt hash, ROLE_*)
+    AuthMgr->>AuthMgr: compare BCrypt hash with submitted password
+
+    alt credentials valid
+        AuthMgr-->>Ctrl: Authentication (success)
+        Ctrl->>Repo: findByUsername(username)
+        Repo-->>Ctrl: User
+        Ctrl->>Jwt: generateToken(username, role)
+        Jwt-->>Ctrl: signed JWT
+        Ctrl->>Ctrl: set HttpOnly cookie "vrs_token"
+        Ctrl-->>UI: 200 OK {user, expiresInSeconds}
+        UI-->>Staff: redirect to dashboard.html
+    else credentials invalid
+        AuthMgr-->>Ctrl: BadCredentialsException
+        Ctrl-->>UI: 401 Unauthorized {message}
+        UI-->>Staff: show "Invalid username or password"
+    end

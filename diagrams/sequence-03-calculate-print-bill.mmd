@@ -1,0 +1,54 @@
+%% Sequence Diagram 3 - Calculate and Print Bill
+sequenceDiagram
+    actor Staff as Staff Member
+    participant UI as Billing Page<br/>(billing.html / billing.js)
+    participant Ctrl as BillController
+    participant Svc as BillServiceImpl
+    participant ResRepo as ReservationRepository
+    participant BillRepo as BillRepository
+    participant Factory as BillFactory
+    participant Context as PricingContext
+    participant Strategy as PricingStrategy<br/>(Standard / Weekend / LongTerm)
+    participant Publisher as ReservationEventPublisher
+    participant DB as MySQL
+
+    Staff->>UI: open reservation, click "Generate / View Bill"
+    UI->>Ctrl: GET /api/bills/reservation/{reservationNumber}
+    Ctrl->>Svc: generateOrFetch(reservationNumber)
+
+    Svc->>ResRepo: findByReservationNumber(reservationNumber)
+    ResRepo->>DB: SELECT * FROM reservations WHERE reservation_number = ?
+    DB-->>ResRepo: Reservation row
+    ResRepo-->>Svc: Reservation
+
+    Svc->>BillRepo: findByReservationId(reservation.id)
+
+    alt bill already generated
+        BillRepo->>DB: SELECT * FROM bills WHERE reservation_id = ?
+        DB-->>BillRepo: Bill row
+        BillRepo-->>Svc: Bill (existing, figures unchanged)
+    else no bill yet
+        BillRepo-->>Svc: empty
+        Svc->>Factory: create(reservation)
+        Factory->>Factory: days = max(1, DATEDIFF(returnDate, pickupDate))
+        Factory->>Context: price(dailyRate, days, pickupDate)
+        Context->>Context: resolveStrategy(days, pickupDate)
+        Context->>Strategy: calculate(dailyRate, days, pickupDate)
+        Strategy-->>Context: PricingResult(subtotal, surcharge,<br/>discount, tax, total)
+        Context-->>Factory: PricingResult
+        Factory-->>Svc: Bill (unsaved)
+
+        Svc->>BillRepo: save(bill)
+        BillRepo->>DB: INSERT INTO bills
+        DB-->>BillRepo: saved Bill
+        BillRepo-->>Svc: Bill
+
+        Svc->>Publisher: publish(ReservationEvent(BILL_GENERATED))
+    end
+
+    Svc-->>Ctrl: BillResponse
+    Ctrl-->>UI: 200 OK {billNumber, totalAmount, ...}
+    UI-->>Staff: render printable receipt
+
+    Staff->>UI: click "Print Receipt"
+    UI->>UI: window.print() (browser print / save-as-PDF dialog)

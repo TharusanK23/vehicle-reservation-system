@@ -6,25 +6,39 @@ CIS6003 assignment brief, plus the Entity-Relationship diagram for the database
 
 | File | Diagram | Notes |
 |---|---|---|
-| `use-case-diagram.puml` / `.png` | Use Case Diagram | Actors, use cases, `<<include>>`/`<<extend>>` stereotypes |
-| `class-diagram.puml` / `.png` | Class Diagram | Domain model + service layer + all 5 design patterns |
-| `sequence-01-login.puml` / `.png` | Sequence Diagram 1 | User Authentication (Login) |
-| `sequence-02-register-reservation.puml` / `.png` | Sequence Diagram 2 | Register New Reservation |
-| `sequence-03-calculate-print-bill.puml` / `.png` | Sequence Diagram 3 | Calculate and Print Bill |
-| `er-diagram.puml` / `.png` | Entity Relationship Diagram | Database schema (7 tables) |
+| `use-case-diagram.mmd` / `.png` | Use Case Diagram | Actors, use cases, `<<include>>`/`<<extend>>` stereotypes |
+| `class-diagram.mmd` / `.png` | Class Diagram | Domain model + service layer + all 5 design patterns |
+| `sequence-01-login.mmd` / `.png` | Sequence Diagram 1 | User Authentication (Login) |
+| `sequence-02-register-reservation.mmd` / `.png` | Sequence Diagram 2 | Register New Reservation |
+| `sequence-03-calculate-print-bill.mmd` / `.png` | Sequence Diagram 3 | Calculate and Print Bill |
+| `er-diagram.mmd` / `.png` | Entity Relationship Diagram | Database schema (7 tables) |
 
-All diagrams are authored as [PlantUML](https://plantuml.com) source (`.puml`) and
-pre-rendered to `.png` so they can be viewed without any tooling. To regenerate them
-after an edit:
+All diagrams are authored as [Mermaid](https://mermaid.js.org) source (`.mmd`) and
+pre-rendered to `.png` so they can be viewed without any tooling. Mermaid also
+renders `.mmd`/fenced-mermaid content natively on GitHub and in Claude
+Artifacts, so these files are directly viewable there too, not just as static
+images. To regenerate the PNGs after an edit:
 
 ```bash
 cd diagrams
-curl -sL -o tools/plantuml.jar https://github.com/plantuml/plantuml/releases/download/v1.2024.7/plantuml-1.2024.7.jar
-java -jar tools/plantuml.jar -tpng *.puml
+npx @mermaid-js/mermaid-cli -i class-diagram.mmd -o class-diagram.png -b white -s 2
+# repeat per file, or: for f in *.mmd; do npx @mermaid-js/mermaid-cli -i "$f" -o "${f%.mmd}.png" -b white -s 2; done
 ```
 
-(Java and Graphviz `dot` must be on the PATH; `dot -version` was verified as
-`graphviz 2.44.1` on the development machine used for this coursework.)
+(Requires Node.js; `mmdc` launches a headless Chromium via Puppeteer the first
+time it runs, which it downloads automatically.)
+
+**Note on the Class, Sequence and ER diagrams vs. the Use Case diagram:**
+Mermaid has first-class native syntax for `classDiagram`, `sequenceDiagram`
+and `erDiagram`, so those five diagrams use proper UML/ER constructs
+(visibility modifiers, `<<interface>>`/`<<abstract>>` stereotypes,
+inheritance/realisation/aggregation/composition arrows, crow's-foot
+cardinality). Mermaid has **no** native UML use-case diagram type, so
+`use-case-diagram.mmd` is modelled as a flowchart instead - actors as
+labelled nodes, use cases as stadium-shaped nodes inside a system-boundary
+subgraph, and `<<include>>`/`<<extend>>` as labelled dashed edges - the
+closest faithful equivalent the tool supports, while still showing every
+actor, use case, and stereotype relationship required by Task A.
 
 ## Important note on the assignment brief's scenario
 

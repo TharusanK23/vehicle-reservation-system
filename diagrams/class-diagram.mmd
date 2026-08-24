@@ -1,0 +1,220 @@
+%% Online Vehicle Reservation System - Class Diagram
+classDiagram
+    direction TB
+
+    class User {
+        -Long id
+        -String username
+        -String password
+        -String fullName
+        -String email
+        -Role role
+        -boolean enabled
+        -LocalDateTime createdAt
+        +getUsername() String
+        +getRole() Role
+    }
+    class Role {
+        <<enumeration>>
+        ADMIN
+        STAFF
+    }
+
+    class Customer {
+        -Long id
+        -String fullName
+        -String address
+        -String contactNumber
+        -String email
+        -String licenseNumber
+        -LocalDateTime createdAt
+        +getFullName() String
+    }
+
+    class VehicleCategory {
+        -Long id
+        -String categoryName
+        -BigDecimal dailyRate
+        -String description
+        +getDailyRate() BigDecimal
+    }
+
+    class Vehicle {
+        -Long id
+        -String registrationNumber
+        -String make
+        -String model
+        -int manufactureYear
+        -VehicleStatus status
+        -String imageUrl
+        +getStatus() VehicleStatus
+        +setStatus(VehicleStatus) void
+    }
+    class VehicleStatus {
+        <<enumeration>>
+        AVAILABLE
+        RESERVED
+        MAINTENANCE
+        INACTIVE
+    }
+
+    class Reservation {
+        -Long id
+        -String reservationNumber
+        -LocalDate pickupDate
+        -LocalTime pickupTime
+        -LocalDate returnDate
+        -LocalTime returnTime
+        -ReservationStatus status
+        -String notes
+        -LocalDateTime createdAt
+        +getReservationNumber() String
+    }
+    class ReservationStatus {
+        <<enumeration>>
+        PENDING
+        CONFIRMED
+        ONGOING
+        COMPLETED
+        CANCELLED
+    }
+
+    class Bill {
+        -Long id
+        -String billNumber
+        -int numberOfDays
+        -BigDecimal dailyRate
+        -BigDecimal subtotal
+        -BigDecimal surchargeAmount
+        -BigDecimal discountAmount
+        -BigDecimal taxAmount
+        -BigDecimal totalAmount
+        -String pricingStrategy
+        -PaymentStatus paymentStatus
+        -String paymentMethod
+        -LocalDateTime generatedAt
+        +getTotalAmount() BigDecimal
+    }
+    class PaymentStatus {
+        <<enumeration>>
+        UNPAID
+        PAID
+    }
+
+    User "1" --o "0..*" Reservation : creates
+    Customer "1" o-- "0..*" Reservation : books
+    Vehicle "1" o-- "0..*" Reservation : reserved in
+    VehicleCategory "1" o-- "0..*" Vehicle : classifies
+    Reservation "1" *-- "0..1" Bill : generates
+    Reservation --> ReservationStatus
+    Vehicle --> VehicleStatus
+    Bill --> PaymentStatus
+    User --> Role
+
+    class ReservationService {
+        <<interface>>
+        +register(RegisterReservationRequest, String) ReservationResponse
+        +findByReservationNumber(String) ReservationResponse
+        +cancel(String) ReservationResponse
+    }
+    class ReservationServiceImpl
+    ReservationService <|.. ReservationServiceImpl
+
+    class BillService {
+        <<interface>>
+        +generateOrFetch(String) BillResponse
+        +settlePayment(String, SettlePaymentRequest) BillResponse
+    }
+    class BillServiceImpl
+    BillService <|.. BillServiceImpl
+
+    class ReservationBuilder {
+        -Customer customer
+        -Vehicle vehicle
+        -LocalDate pickupDate
+        -LocalDate returnDate
+        +withCustomer(Customer) ReservationBuilder
+        +withVehicle(Vehicle) ReservationBuilder
+        +withPickup(LocalDate, LocalTime) ReservationBuilder
+        +withReturn(LocalDate, LocalTime) ReservationBuilder
+        +build() Reservation
+    }
+
+    class DocumentFactory~T,S~ {
+        <<interface>>
+        +create(S) T
+    }
+    class BillFactory {
+        +create(Reservation) Bill
+    }
+    DocumentFactory <|.. BillFactory
+
+    class PricingStrategy {
+        <<interface>>
+        +calculate(BigDecimal, int, LocalDate) PricingResult
+        +getName() String
+    }
+    class AbstractPricingStrategy {
+        <<abstract>>
+        #double taxRate
+        #buildResult(BigDecimal, BigDecimal, BigDecimal) PricingResult
+    }
+    class StandardPricingStrategy
+    class WeekendPricingStrategy {
+        -double surchargeRate
+    }
+    class LongTermDiscountPricingStrategy {
+        -double discountRate
+    }
+    class PricingContext {
+        -BusinessProperties props
+        +price(BigDecimal, int, LocalDate) PricingResult
+        -resolveStrategy(int, LocalDate) PricingStrategy
+    }
+    PricingStrategy <|.. AbstractPricingStrategy
+    AbstractPricingStrategy <|-- StandardPricingStrategy
+    AbstractPricingStrategy <|-- WeekendPricingStrategy
+    AbstractPricingStrategy <|-- LongTermDiscountPricingStrategy
+    PricingContext ..> PricingStrategy : selects
+
+    class ReservationObserver {
+        <<interface>>
+        +onReservationEvent(ReservationEvent) void
+    }
+    class ReservationEventPublisher {
+        -List~ReservationObserver~ observers
+        +publish(ReservationEvent) void
+    }
+    class EmailNotificationObserver
+    class SmsNotificationObserver
+    class AuditLogObserver
+    ReservationObserver <|.. EmailNotificationObserver
+    ReservationObserver <|.. SmsNotificationObserver
+    ReservationObserver <|.. AuditLogObserver
+    ReservationEventPublisher o-- "0..*" ReservationObserver
+
+    class ReservationNumberGenerator {
+        -ReservationNumberGenerator$ INSTANCE$
+        -AtomicLong sequence
+        -ReservationNumberGenerator()
+        +getInstance()$ ReservationNumberGenerator
+        +nextReservationNumber() String
+    }
+    class AppConfigManager {
+        -AppConfigManager$ INSTANCE$
+        -Map~String,String~ settings
+        -AppConfigManager()
+        +getInstance()$ AppConfigManager
+        +get(String) String
+    }
+
+    ReservationServiceImpl ..> ReservationBuilder : uses
+    ReservationServiceImpl ..> ReservationEventPublisher : uses
+    ReservationServiceImpl ..> Customer
+    ReservationServiceImpl ..> Vehicle
+    ReservationServiceImpl ..> Reservation
+    BillServiceImpl ..> BillFactory : uses
+    BillFactory ..> PricingContext : uses
+    BillFactory ..> Bill
+    ReservationBuilder ..> ReservationNumberGenerator : uses
+    BillFactory ..> ReservationNumberGenerator : uses
