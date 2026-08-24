@@ -1,0 +1,48 @@
+# Sunrise Vehicle Rentals — Online Vehicle Reservation System
+
+A full-stack Java coursework project for **CIS6003 Advanced Programming**
+(Cardiff Metropolitan University / ICBT Campus), implementing a distributed,
+three-tier vehicle reservation and billing system with a Spring Boot REST API,
+a MySQL database (via XAMPP), and a static HTML/CSS/JS client.
+
+> **Read [`docs/SETUP.md`](docs/SETUP.md) first** — it has the complete
+> install/run/test/troubleshoot walkthrough for localhost.
+
+## Project layout
+
+```
+VehicleReservationSystem/
+├── backend/          Spring Boot 3 (Java 17) REST API — Maven project (use ./mvnw)
+├── frontend/          Static HTML/CSS/JS client (Bootstrap 5, vendored locally)
+├── database/          MySQL schema.sql (tables, triggers, procedure, views, seed data)
+├── diagrams/          Use Case / Class / Sequence x3 / ER diagrams (PlantUML + PNG)
+├── testing/            Test plan, test case matrix, Postman collection, test evidence
+├── docs/                SETUP.md, the assignment report, and the Git workflow write-up
+└── .github/workflows/   CI pipeline (build + test on every push)
+```
+
+## Quick start
+
+```
+1. Start MySQL (XAMPP) and import database/schema.sql
+2. cd backend && ./mvnw.cmd spring-boot:run        (API on http://localhost:8081)
+3. Serve frontend/ via XAMPP Apache (or any static server) on http://localhost/vehicle-reservation-client/
+4. Log in with admin / admin123 or staff1 / staff123
+```
+
+Full details, including troubleshooting XAMPP-specific issues, are in
+[`docs/SETUP.md`](docs/SETUP.md).
+
+## What's implemented
+
+Every functionality from the assignment brief (login, register a new
+reservation, search/display reservation details, calculate & print a bill, a
+help section, and a safe exit/logout) plus the Task B requirements: a
+distributed REST API, five GoF design patterns, a three-tier architecture, and
+a MySQL database with triggers/a stored procedure/views for advanced reporting.
+
+See [`docs/ASSIGNMENT_REPORT.md`](docs/ASSIGNMENT_REPORT.md) for the full
+write-up (design rationale, pattern justification, testing strategy, and
+evaluation against the marking criteria), and
+[`diagrams/README.md`](diagrams/README.md) for the documented assumptions
+behind the design.
