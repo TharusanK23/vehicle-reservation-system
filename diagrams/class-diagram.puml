@@ -1,0 +1,223 @@
+@startuml class-diagram
+title Online Vehicle Reservation System - Class Diagram
+skinparam backgroundColor white
+skinparam classAttributeIconSize 0
+skinparam packageStyle rectangle
+hide empty members
+
+package "domain" {
+    class User {
+        -id: Long
+        -username: String
+        -password: String
+        -fullName: String
+        -email: String
+        -role: Role
+        -enabled: boolean
+        -createdAt: LocalDateTime
+        +getUsername(): String
+        +getRole(): Role
+    }
+
+    enum Role {
+        ADMIN
+        STAFF
+    }
+
+    class Customer {
+        -id: Long
+        -fullName: String
+        -address: String
+        -contactNumber: String
+        -email: String
+        -licenseNumber: String
+        -createdAt: LocalDateTime
+        +getFullName(): String
+    }
+
+    class VehicleCategory {
+        -id: Long
+        -categoryName: String
+        -dailyRate: BigDecimal
+        -description: String
+        +getDailyRate(): BigDecimal
+    }
+
+    class Vehicle {
+        -id: Long
+        -registrationNumber: String
+        -make: String
+        -model: String
+        -manufactureYear: int
+        -status: VehicleStatus
+        -imageUrl: String
+        +getStatus(): VehicleStatus
+        +setStatus(VehicleStatus): void
+    }
+
+    enum VehicleStatus {
+        AVAILABLE
+        RESERVED
+        MAINTENANCE
+        INACTIVE
+    }
+
+    class Reservation {
+        -id: Long
+        -reservationNumber: String
+        -pickupDate: LocalDate
+        -pickupTime: LocalTime
+        -returnDate: LocalDate
+        -returnTime: LocalTime
+        -status: ReservationStatus
+        -notes: String
+        -createdAt: LocalDateTime
+        +getReservationNumber(): String
+    }
+
+    enum ReservationStatus {
+        PENDING
+        CONFIRMED
+        ONGOING
+        COMPLETED
+        CANCELLED
+    }
+
+    class Bill {
+        -id: Long
+        -billNumber: String
+        -numberOfDays: int
+        -dailyRate: BigDecimal
+        -subtotal: BigDecimal
+        -surchargeAmount: BigDecimal
+        -discountAmount: BigDecimal
+        -taxAmount: BigDecimal
+        -totalAmount: BigDecimal
+        -pricingStrategy: String
+        -paymentStatus: PaymentStatus
+        -paymentMethod: String
+        -generatedAt: LocalDateTime
+        +getTotalAmount(): BigDecimal
+    }
+
+    enum PaymentStatus {
+        UNPAID
+        PAID
+    }
+
+    User "1" -- "0..*" Reservation : creates >
+    Customer "1" o-- "0..*" Reservation : books >
+    Vehicle "1" o-- "0..*" Reservation : reserved in >
+    VehicleCategory "1" o-- "0..*" Vehicle : classifies >
+    Reservation "1" *-- "0..1" Bill : generates >
+    Reservation --> ReservationStatus
+    Vehicle --> VehicleStatus
+    Bill --> PaymentStatus
+    User --> Role
+}
+
+package "service" {
+    interface ReservationService {
+        +register(RegisterReservationRequest, String): ReservationResponse
+        +findByReservationNumber(String): ReservationResponse
+        +cancel(String): ReservationResponse
+    }
+    class ReservationServiceImpl implements ReservationService
+
+    interface BillService {
+        +generateOrFetch(String): BillResponse
+        +settlePayment(String, SettlePaymentRequest): BillResponse
+    }
+    class BillServiceImpl implements BillService
+}
+
+package "pattern.builder" {
+    class ReservationBuilder {
+        -customer: Customer
+        -vehicle: Vehicle
+        -pickupDate: LocalDate
+        -returnDate: LocalDate
+        +withCustomer(Customer): ReservationBuilder
+        +withVehicle(Vehicle): ReservationBuilder
+        +withPickup(LocalDate, LocalTime): ReservationBuilder
+        +withReturn(LocalDate, LocalTime): ReservationBuilder
+        +build(): Reservation
+    }
+}
+
+package "pattern.factory" {
+    interface DocumentFactory<T, S> {
+        +create(S): T
+    }
+    class BillFactory implements DocumentFactory {
+        +create(Reservation): Bill
+    }
+}
+
+package "pattern.strategy" {
+    interface PricingStrategy {
+        +calculate(BigDecimal, int, LocalDate): PricingResult
+        +getName(): String
+    }
+    abstract class AbstractPricingStrategy implements PricingStrategy {
+        #taxRate: double
+        #buildResult(BigDecimal, BigDecimal, BigDecimal): PricingResult
+    }
+    class StandardPricingStrategy extends AbstractPricingStrategy
+    class WeekendPricingStrategy extends AbstractPricingStrategy {
+        -surchargeRate: double
+    }
+    class LongTermDiscountPricingStrategy extends AbstractPricingStrategy {
+        -discountRate: double
+    }
+    class PricingContext {
+        -props: BusinessProperties
+        +price(BigDecimal, int, LocalDate): PricingResult
+        -resolveStrategy(int, LocalDate): PricingStrategy
+    }
+    PricingContext ..> PricingStrategy : selects >
+}
+
+package "pattern.observer" {
+    interface ReservationObserver {
+        +onReservationEvent(ReservationEvent): void
+    }
+    class ReservationEventPublisher {
+        -observers: List<ReservationObserver>
+        +publish(ReservationEvent): void
+    }
+    class EmailNotificationObserver implements ReservationObserver
+    class SmsNotificationObserver implements ReservationObserver
+    class AuditLogObserver implements ReservationObserver
+    ReservationEventPublisher o-- "0..*" ReservationObserver
+}
+
+package "pattern.singleton" {
+    class ReservationNumberGenerator {
+        -{static} INSTANCE: ReservationNumberGenerator
+        -sequence: AtomicLong
+        -ReservationNumberGenerator()
+        +{static} getInstance(): ReservationNumberGenerator
+        +nextReservationNumber(): String
+    }
+    class AppConfigManager {
+        -{static} INSTANCE: AppConfigManager
+        -settings: Map<String, String>
+        -AppConfigManager()
+        +{static} getInstance(): AppConfigManager
+        +get(String): String
+    }
+}
+
+ReservationServiceImpl ..> ReservationBuilder : uses >
+ReservationServiceImpl ..> ReservationEventPublisher : uses >
+ReservationServiceImpl ..> Customer
+ReservationServiceImpl ..> Vehicle
+ReservationServiceImpl ..> Reservation
+BillServiceImpl ..> BillFactory : uses >
+BillFactory ..> PricingContext : uses >
+BillFactory ..> Bill
+ReservationBuilder ..> ReservationNumberGenerator : uses >
+BillFactory ..> ReservationNumberGenerator : uses >
+
+@enduml

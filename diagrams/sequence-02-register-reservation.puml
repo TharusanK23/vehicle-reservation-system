@@ -1,0 +1,63 @@
+@startuml sequence-02-register-reservation
+title Sequence Diagram 2 - Register New Reservation
+skinparam backgroundColor white
+actor "Staff Member" as Staff
+participant "Reservation Form\n(reservations.html / reservations.js)" as UI
+participant "ReservationController" as Ctrl
+participant "ReservationServiceImpl" as Svc
+participant "CustomerRepository" as CustRepo
+participant "VehicleRepository" as VehRepo
+participant "ReservationRepository" as ResRepo
+participant "ReservationBuilder" as Builder
+participant "ReservationNumberGenerator\n(Singleton)" as NumGen
+participant "ReservationEventPublisher" as Publisher
+database "MySQL" as DB
+
+Staff -> UI : fill customer, vehicle, pickup/return dates, click "Save"
+UI -> Ctrl : POST /api/reservations {payload}
+Ctrl -> Svc : register(request, "staff1")
+
+Svc -> CustRepo : findById(customerId) OR save(new Customer)
+CustRepo -> DB : SELECT / INSERT INTO customers
+DB --> CustRepo : Customer row
+CustRepo --> Svc : Customer
+
+Svc -> VehRepo : findById(vehicleId)
+VehRepo -> DB : SELECT * FROM vehicles WHERE id = ?
+DB --> VehRepo : Vehicle row
+VehRepo --> Svc : Vehicle
+
+Svc -> ResRepo : findOverlappingForVehicle(vehicleId, pickupDate, returnDate)
+ResRepo -> DB : SELECT * FROM reservations WHERE ... (date overlap)
+DB --> ResRepo : matching rows
+
+alt vehicle already booked for an overlapping date range
+    ResRepo --> Svc : [existing reservation]
+    Svc --> Ctrl : throw BusinessRuleException
+    Ctrl --> UI : 409 Conflict {message}
+    UI --> Staff : show "Vehicle already reserved for these dates"
+else no conflict
+    ResRepo --> Svc : []
+    Svc -> Builder : withCustomer().withVehicle().withPickup().withReturn().build()
+    Builder -> NumGen : nextReservationNumber()
+    NumGen --> Builder : "RES-2026-000123"
+    Builder --> Svc : Reservation (validated, unsaved)
+
+    Svc -> ResRepo : save(reservation)
+    ResRepo -> DB : INSERT INTO reservations\n(trg_prevent_double_booking re-checked at DB level)
+    DB --> ResRepo : saved Reservation
+    ResRepo --> Svc : Reservation
+
+    Svc -> VehRepo : save(vehicle with status = RESERVED)
+    VehRepo -> DB : UPDATE vehicles SET status = 'RESERVED'
+    DB --> VehRepo : ack
+
+    Svc -> Publisher : publish(ReservationEvent(CREATED))
+    Publisher -> Publisher : notify EmailNotificationObserver,\nSmsNotificationObserver, AuditLogObserver
+
+    Svc --> Ctrl : ReservationResponse
+    Ctrl --> UI : 201 Created {reservationNumber, ...}
+    UI --> Staff : redirect to reservation-detail.html
+end
+
+@enduml

@@ -1,0 +1,39 @@
+@startuml sequence-01-login
+title Sequence Diagram 1 - User Authentication (Login)
+skinparam backgroundColor white
+actor "Staff Member" as Staff
+participant "Login Page\n(index.html / api.js)" as UI
+participant "AuthController" as Ctrl
+participant "AuthenticationManager" as AuthMgr
+participant "CustomUserDetailsService" as UDS
+participant "UserRepository" as Repo
+database "MySQL\n(users table)" as DB
+participant "JwtService" as Jwt
+
+Staff -> UI : enter username & password, click "Sign In"
+UI -> Ctrl : POST /api/auth/login {username, password}
+Ctrl -> AuthMgr : authenticate(UsernamePasswordAuthenticationToken)
+AuthMgr -> UDS : loadUserByUsername(username)
+UDS -> Repo : findByUsername(username)
+Repo -> DB : SELECT * FROM users WHERE username = ?
+DB --> Repo : user row
+Repo --> UDS : Optional<User>
+UDS --> AuthMgr : UserDetails (BCrypt hash, ROLE_*)
+AuthMgr -> AuthMgr : compare BCrypt hash with submitted password
+
+alt credentials valid
+    AuthMgr --> Ctrl : Authentication (success)
+    Ctrl -> Repo : findByUsername(username)
+    Repo --> Ctrl : User
+    Ctrl -> Jwt : generateToken(username, role)
+    Jwt --> Ctrl : signed JWT
+    Ctrl -> Ctrl : set HttpOnly cookie "vrs_token"
+    Ctrl --> UI : 200 OK {user, expiresInSeconds}
+    UI --> Staff : redirect to dashboard.html
+else credentials invalid
+    AuthMgr --> Ctrl : BadCredentialsException
+    Ctrl --> UI : 401 Unauthorized {message}
+    UI --> Staff : show "Invalid username or password"
+end
+
+@enduml
