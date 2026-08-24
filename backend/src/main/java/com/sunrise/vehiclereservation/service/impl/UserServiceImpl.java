@@ -1,0 +1,59 @@
+package com.sunrise.vehiclereservation.service.impl;
+
+import com.sunrise.vehiclereservation.dto.request.CreateUserRequest;
+import com.sunrise.vehiclereservation.dto.response.UserResponse;
+import com.sunrise.vehiclereservation.entity.User;
+import com.sunrise.vehiclereservation.exception.DuplicateResourceException;
+import com.sunrise.vehiclereservation.exception.ResourceNotFoundException;
+import com.sunrise.vehiclereservation.repository.UserRepository;
+import com.sunrise.vehiclereservation.service.UserService;
+import com.sunrise.vehiclereservation.util.DtoMapper;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+
+/** Administers staff accounts. Only an ADMIN may create or deactivate accounts (enforced in SecurityConfig / controller). */
+@Service
+@Transactional
+public class UserServiceImpl implements UserService {
+
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
+
+    public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<UserResponse> findAll() {
+        return userRepository.findAll().stream().map(DtoMapper::toResponse).toList();
+    }
+
+    @Override
+    public UserResponse create(CreateUserRequest request) {
+        if (userRepository.existsByUsername(request.username())) {
+            throw new DuplicateResourceException("A staff account with username '" + request.username() + "' already exists.");
+        }
+        User user = User.builder()
+                .username(request.username())
+                .password(passwordEncoder.encode(request.password()))
+                .fullName(request.fullName())
+                .email(request.email())
+                .role(request.role())
+                .enabled(true)
+                .build();
+        return DtoMapper.toResponse(userRepository.save(user));
+    }
+
+    @Override
+    public void deactivate(Long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Staff account not found with id: " + id));
+        user.setEnabled(false);
+        userRepository.save(user);
+    }
+}
