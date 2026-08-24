@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reservations - Sunrise Vehicle Rentals</title>
+    <link rel="stylesheet" href="../assets/vendor/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../assets/css/styles.css">
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark navbar-sunrise no-print">
+    <div class="container-fluid">
+        <a class="navbar-brand navbar-brand-custom" href="dashboard.html">Sunrise Vehicle Rentals</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMain">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navMain">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item"><a class="nav-link" href="dashboard.html">Dashboard</a></li>
+                <li class="nav-item"><a class="nav-link" href="reservations.html">Reservations</a></li>
+                <li class="nav-item"><a class="nav-link" href="vehicles.html">Vehicles</a></li>
+                <li class="nav-item"><a class="nav-link" href="customers.html">Customers</a></li>
+                <li class="nav-item"><a class="nav-link" href="reports.html">Reports</a></li>
+                <li class="nav-item" data-role-admin-only><a class="nav-link" href="users.html">Staff Accounts</a></li>
+                <li class="nav-item"><a class="nav-link" href="help.html">Help</a></li>
+            </ul>
+            <ul class="navbar-nav align-items-lg-center">
+                <li class="nav-item text-white-50 small me-lg-3"><span id="navUserName"></span> (<span id="navUserRole"></span>)</li>
+                <li class="nav-item"><a class="btn btn-outline-light btn-sm" href="#" id="logoutBtn">Logout</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<main class="container-fluid px-4 py-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1 class="h4 section-title mb-0">Reservations</h1>
+        <button class="btn btn-brand" id="toggleFormBtn">+ New Reservation</button>
+    </div>
+
+    <div id="alertBox"></div>
+
+    <!-- "Display Appointment Details": search an existing reservation by its number -->
+    <div class="card p-3 mb-4">
+        <h2 class="h6 section-title">Find a Reservation</h2>
+        <form id="searchForm" class="row g-2">
+            <div class="col-sm-6 col-md-4">
+                <input type="text" class="form-control" id="searchNumber" placeholder="e.g. RES-2026-000001" required>
+            </div>
+            <div class="col-auto">
+                <button type="submit" class="btn btn-outline-brand">Search</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- "Register New Appointment" -->
+    <div class="card p-3 mb-4 d-none" id="newReservationCard">
+        <h2 class="h6 section-title">Register New Reservation</h2>
+        <div id="formAlert"></div>
+        <form id="reservationForm" novalidate>
+            <div class="row g-3">
+                <div class="col-12">
+                    <div class="btn-group" role="group" aria-label="Customer type">
+                        <input type="radio" class="btn-check" name="customerMode" id="modeNew" value="new" checked>
+                        <label class="btn btn-outline-brand btn-sm" for="modeNew">New Customer</label>
+                        <input type="radio" class="btn-check" name="customerMode" id="modeExisting" value="existing">
+                        <label class="btn btn-outline-brand btn-sm" for="modeExisting">Existing Customer</label>
+                    </div>
+                </div>
+
+                <div class="col-12" id="existingCustomerBlock" style="display:none;">
+                    <label class="form-label">Select Customer</label>
+                    <select class="form-select" id="customerSelect"></select>
+                </div>
+
+                <div id="newCustomerBlock" class="col-12 row g-3">
+                    <div class="col-md-4">
+                        <label class="form-label">Full Name</label>
+                        <input type="text" class="form-control" id="customerFullName">
+                        <div class="field-error" id="err-customerFullName"></div>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Address</label>
+                        <input type="text" class="form-control" id="customerAddress">
+                        <div class="field-error" id="err-customerAddress"></div>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Contact Number</label>
+                        <input type="text" class="form-control" id="customerContactNumber" placeholder="0771234567">
+                        <div class="field-error" id="err-customerContactNumber"></div>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Email (optional)</label>
+                        <input type="email" class="form-control" id="customerEmail">
+                        <div class="field-error" id="err-customerEmail"></div>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Driving License No. (optional)</label>
+                        <input type="text" class="form-control" id="customerLicenseNumber">
+                    </div>
+                </div>
+
+                <div class="col-12"><hr></div>
+
+                <div class="col-md-3">
+                    <label class="form-label">Vehicle Category</label>
+                    <select class="form-select" id="categoryFilter"></select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Pickup Date</label>
+                    <input type="date" class="form-control" id="pickupDate">
+                    <div class="field-error" id="err-pickupDate"></div>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Pickup Time</label>
+                    <input type="time" class="form-control" id="pickupTime" value="09:00">
+                    <div class="field-error" id="err-pickupTime"></div>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">&nbsp;</label>
+                    <button type="button" class="btn btn-outline-brand w-100" id="checkAvailabilityBtn">Check Availability</button>
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label">Return Date</label>
+                    <input type="date" class="form-control" id="returnDate">
+                    <div class="field-error" id="err-returnDate"></div>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Return Time</label>
+                    <input type="time" class="form-control" id="returnTime" value="09:00">
+                    <div class="field-error" id="err-returnTime"></div>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Available Vehicle</label>
+                    <select class="form-select" id="vehicleSelect" required>
+                        <option value="">-- Check availability first --</option>
+                    </select>
+                    <div class="field-error" id="err-vehicleId"></div>
+                </div>
+
+                <div class="col-12">
+                    <label class="form-label">Notes (optional)</label>
+                    <textarea class="form-control" id="notes" rows="2"></textarea>
+                </div>
+
+                <div class="col-12">
+                    <button type="submit" class="btn btn-brand" id="submitReservationBtn">Save Reservation</button>
+                    <button type="button" class="btn btn-outline-secondary" id="cancelFormBtn">Cancel</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <div class="card p-3">
+        <h2 class="h6 section-title">All Reservations</h2>
+        <div class="table-responsive">
+            <table class="table align-middle">
+                <thead>
+                <tr><th>Reservation No.</th><th>Customer</th><th>Vehicle</th><th>Pickup</th><th>Return</th><th>Status</th><th></th></tr>
+                </thead>
+                <tbody id="reservationsBody"><tr><td colspan="7" class="text-muted">Loading...</td></tr></tbody>
+            </table>
+        </div>
+    </div>
+</main>
+
+<script src="../assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="../assets/js/api.js"></script>
+<script src="../assets/js/auth.js"></script>
+<script src="../assets/js/reservations.js"></script>
+</body>
+</html>

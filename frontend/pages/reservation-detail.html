@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reservation Details - Sunrise Vehicle Rentals</title>
+    <link rel="stylesheet" href="../assets/vendor/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../assets/css/styles.css">
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark navbar-sunrise no-print">
+    <div class="container-fluid">
+        <a class="navbar-brand navbar-brand-custom" href="dashboard.html">Sunrise Vehicle Rentals</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMain">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navMain">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item"><a class="nav-link" href="dashboard.html">Dashboard</a></li>
+                <li class="nav-item"><a class="nav-link" href="reservations.html">Reservations</a></li>
+                <li class="nav-item"><a class="nav-link" href="vehicles.html">Vehicles</a></li>
+                <li class="nav-item"><a class="nav-link" href="customers.html">Customers</a></li>
+                <li class="nav-item"><a class="nav-link" href="reports.html">Reports</a></li>
+                <li class="nav-item" data-role-admin-only><a class="nav-link" href="users.html">Staff Accounts</a></li>
+                <li class="nav-item"><a class="nav-link" href="help.html">Help</a></li>
+            </ul>
+            <ul class="navbar-nav align-items-lg-center">
+                <li class="nav-item text-white-50 small me-lg-3"><span id="navUserName"></span> (<span id="navUserRole"></span>)</li>
+                <li class="nav-item"><a class="btn btn-outline-light btn-sm" href="#" id="logoutBtn">Logout</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<main class="container px-4 py-4">
+    <a href="reservations.html" class="btn btn-sm btn-outline-secondary mb-3 no-print">&larr; Back to Reservations</a>
+    <div id="alertBox"></div>
+
+    <div class="card p-4" id="detailCard" style="display:none;">
+        <div class="d-flex justify-content-between align-items-start flex-wrap">
+            <div>
+                <h1 class="h4 section-title mb-1" id="resNumber"></h1>
+                <span class="badge bg-secondary status-badge" id="resStatus"></span>
+            </div>
+            <div class="btn-group mt-2 mt-md-0 no-print">
+                <a class="btn btn-brand" id="generateBillBtn" href="#">Generate / View Bill</a>
+                <button class="btn btn-outline-danger" id="cancelBtn">Cancel Reservation</button>
+            </div>
+        </div>
+
+        <hr>
+
+        <div class="row g-4">
+            <div class="col-md-6">
+                <h2 class="h6 section-title">Customer</h2>
+                <dl class="row mb-0">
+                    <dt class="col-5">Name</dt><dd class="col-7" id="custName"></dd>
+                    <dt class="col-5">Address</dt><dd class="col-7" id="custAddress"></dd>
+                    <dt class="col-5">Contact No.</dt><dd class="col-7" id="custContact"></dd>
+                    <dt class="col-5">Email</dt><dd class="col-7" id="custEmail"></dd>
+                </dl>
+            </div>
+            <div class="col-md-6">
+                <h2 class="h6 section-title">Vehicle</h2>
+                <dl class="row mb-0">
+                    <dt class="col-5">Registration</dt><dd class="col-7" id="vehReg"></dd>
+                    <dt class="col-5">Make / Model</dt><dd class="col-7" id="vehMakeModel"></dd>
+                    <dt class="col-5">Category</dt><dd class="col-7" id="vehCategory"></dd>
+                    <dt class="col-5">Daily Rate</dt><dd class="col-7" id="vehRate"></dd>
+                </dl>
+            </div>
+            <div class="col-md-6">
+                <h2 class="h6 section-title">Booking Period</h2>
+                <dl class="row mb-0">
+                    <dt class="col-5">Pickup</dt><dd class="col-7" id="pickupInfo"></dd>
+                    <dt class="col-5">Return</dt><dd class="col-7" id="returnInfo"></dd>
+                    <dt class="col-5">Notes</dt><dd class="col-7" id="notesInfo"></dd>
+                </dl>
+            </div>
+            <div class="col-md-6">
+                <h2 class="h6 section-title">Booking Meta</h2>
+                <dl class="row mb-0">
+                    <dt class="col-5">Booked By</dt><dd class="col-7" id="createdBy"></dd>
+                    <dt class="col-5">Booked On</dt><dd class="col-7" id="createdAt"></dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+</main>
+
+<script src="../assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="../assets/js/api.js"></script>
+<script src="../assets/js/auth.js"></script>
+<script src="../assets/js/reservation-detail.js"></script>
+</body>
+</html>
