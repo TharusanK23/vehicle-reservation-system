@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: VehicleReservationSystem/backend
+        working-directory: backend
 
     steps:
       - name: Check out repository
@@ -38,7 +38,7 @@ jobs:
         if: always()
         with:
           name: surefire-test-reports
-          path: VehicleReservationSystem/backend/target/surefire-reports/
+          path: backend/target/surefire-reports/
 
       - name: Package (skip tests - already run above)
         run: ./mvnw -B -q package -DskipTests
@@ -47,4 +47,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: vehicle-reservation-backend-jar
-          path: VehicleReservationSystem/backend/target/*.jar
+          path: backend/target/*.jar
