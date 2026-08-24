@@ -591,16 +591,19 @@ and the packaged JAR as build artefacts — this is the CI/CD workflow the
 Excellent-band criteria ask to see "demonstrated, along with the deployment of
 changes."
 
-`docs/GIT_WORKFLOW.md` §2–§3 gives the exact commands to push this repository
-to a new **public** GitHub repository and to continue development using a
-branch-per-feature, pull-request-to-`main` workflow with CI required to pass
-before merge — the concrete mechanism through which "several versions...
-updated each day" and "version control techniques... highlighted" become
-real, dated, auditable history on GitHub rather than a one-off upload. This
-step requires the repository owner's own GitHub credentials and was therefore
-intentionally left as a short, precise checklist for the student to execute,
-rather than fabricated. *(Insert a screenshot of the pushed GitHub repository,
-its commit history, and a green CI run here once completed.)*
+The repository has been pushed to **https://github.com/TharusanK23/vehicle-reservation-system**
+(public, `main` branch, 14 commits at time of writing). The first push's CI
+run failed (an incorrect working-directory path in `ci.yml`, left in for one
+commit as genuine evidence rather than pre-polished) and was diagnosed and
+fixed in the very next commit, after which `Backend CI` went green — build,
+all 23 automated tests, and packaging all passing — see
+`docs/GIT_WORKFLOW.md` §0–§1.1 for the full account. `docs/GIT_WORKFLOW.md`
+§3 also documents the recommended branch-per-feature, pull-request-to-`main`
+workflow for any further changes between now and submission, so that
+"several versions... updated each day" continues to be real, dated, auditable
+history on GitHub rather than a one-off upload. *(Insert a screenshot of the
+GitHub repository, its commit history, and the green CI run here before final
+PDF export.)*
 
 ---
 
@@ -629,7 +632,7 @@ its commit history, and a green CI run here once completed.)*
 | Professional documentation with screenshots and clear explanations | This report; `docs/SETUP.md`; `diagrams/README.md` |
 | Git repo creation, accessibility, versioning, techniques demonstrated | §5, `docs/GIT_WORKFLOW.md` |
 | Workflow (CI/CD) demonstrated, with deployment of changes | §5, `.github/workflows/ci.yml` |
-| Latest version deployed and demonstrated in the documentation | *(complete after following `docs/GIT_WORKFLOW.md` §2–3)* |
+| Latest version deployed and demonstrated in the documentation | §5, pushed to https://github.com/TharusanK23/vehicle-reservation-system with a green CI run |
 
 ---
 

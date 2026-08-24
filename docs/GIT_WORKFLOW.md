@@ -1,5 +1,16 @@
 # Git & GitHub Workflow (Task D)
 
+## 0. Status
+
+✅ Pushed to **https://github.com/TharusanK23/vehicle-reservation-system**
+(public, `main` branch) with 14 milestone-based commits and full history.
+✅ `Backend CI` (`.github/workflows/ci.yml`) ran automatically on push and is
+**green** — build, all 23 automated tests, and packaging all succeeded (check
+the repository's **Actions** tab for the run). One real CI failure was hit and
+fixed along the way (see §1.1) — left in the history deliberately as genuine
+evidence of iterative, version-controlled development rather than a
+pre-polished single upload.
+
 ## 1. What has been set up locally
 
 This project has been initialised as a local Git repository with a **meaningful,
@@ -10,24 +21,26 @@ for a Java + static-frontend project, and a GitHub Actions workflow
 (`.github/workflows/ci.yml`) that builds and runs the full JUnit suite on every
 push. Run `git log --oneline --graph` from `VehicleReservationSystem/` to see it.
 
-## 2. Turning this into your public GitHub repository
+## 1.1 The one real CI failure hit, and how it was fixed
 
-The assistant that generated this project does not have — and should not be
-given — your GitHub credentials, so the steps below must be completed by you.
-They take about two minutes.
+The first push's `Backend CI` run failed at the "Grant execute permission to
+Maven Wrapper" step. Diagnosis via the GitHub Actions API showed the cause:
+the workflow's `working-directory: VehicleReservationSystem/backend` assumed
+the repository had a top-level `VehicleReservationSystem` folder, but since
+this repository's **root already is** that folder (`git init` was run inside
+it), the correct path is simply `backend`. A second, independent issue was
+also present: `backend/mvnw` had been committed without its executable bit set
+(`100644` instead of `100755`), which `chmod +x` alone doesn't fix once
+already committed — it required `git update-index --chmod=+x backend/mvnw`.
+Both were corrected in the commit *"Fix CI: correct backend path ... and mark
+mvnw executable"*, and the very next run went green. This is kept here, not
+edited out of the history, as concrete evidence of the CI feedback loop
+actually being used to catch and fix a real deployment issue.
 
-```bash
-cd VehicleReservationSystem
+## 2. Repository
 
-git remote add origin https://github.com/TharusanK23/vehicle-reservation-system.git
-git branch -M main
-git push -u origin main
-```
-
-Repository: **https://github.com/TharusanK23/vehicle-reservation-system**
-
-GitHub Actions will run automatically on this first push — check the **Actions**
-tab of your repository; you should see the `Backend CI` workflow run and pass.
+**https://github.com/TharusanK23/vehicle-reservation-system** (public, `main`
+branch, pushed via `git remote add origin ... && git push -u origin main`).
 
 ## 3. Recommended ongoing workflow for the rest of the assignment period
 
