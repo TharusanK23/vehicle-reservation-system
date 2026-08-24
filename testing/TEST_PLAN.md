@@ -99,7 +99,7 @@ MySQL for manual tests) are available per `docs/SETUP.md`.
 
 **Exit:** `./mvnw test` reports zero failures and zero errors across all test
 classes (see `testing/evidence/` for a captured passing run at
-23/23 tests), and every row in `TEST_CASES.md` has a `PASS` status.
+25/25 tests), and every row in `TEST_CASES.md` has a `PASS` status.
 
 ## 7. Test automation
 

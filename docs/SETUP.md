@@ -255,6 +255,14 @@ the browser holds the auth cookie), then "Try it out" on any endpoint.
 9. **Admin-only screens** — Log in as `admin`; confirm *Staff Accounts* is
    visible and usable. Log in as `kirisha`; confirm it is hidden, and that
    directly calling `POST /api/users` as staff returns `403 Forbidden`.
+10. **Edit staff details (Admin)** — Log in as `admin` → *Staff Accounts* →
+    click *Edit* on a staff row; confirm the modal opens pre-filled with that
+    account's current name/email (username and role are shown but disabled -
+    not editable here). Change the name/email and *Save Changes*; confirm the
+    table updates immediately and `PATCH /api/users/{id}` returns the updated
+    record. Confirm the same request as `kirisha` (STAFF) returns `403
+    Forbidden`, and that a blank name or an invalid email is rejected with a
+    `400` and an inline field error.
 
 ---
 
@@ -268,7 +276,7 @@ cd VehicleReservationSystem\backend
 This runs all JUnit 5 + Mockito unit tests and the full Spring Boot integration
 test (real Spring context, real Spring Security filter chain, in-memory H2
 database) covering login, registration, double-booking rejection, and billing.
-A summary is printed at the end (`Tests run: 23, Failures: 0, Errors: 0`), and
+A summary is printed at the end (`Tests run: 25, Failures: 0, Errors: 0`), and
 per-class reports are written to `backend/target/surefire-reports/`. See
 `testing/TEST_PLAN.md` and `testing/TEST_CASES.md` for the full rationale, test
 data, and traceability matrix, and `testing/evidence/` for a captured passing

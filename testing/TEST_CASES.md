@@ -4,7 +4,7 @@ Legend for **Type**: `POS` positive · `NEG` negative · `BND` boundary ·
 `VAL` validation · `API` API contract · `DB` database-level · `INT` integration
 
 All statuses below are **PASS**, captured against the automated suite (see
-`testing/evidence/*.txt`, `Tests run: 23, Failures: 0, Errors: 0`) plus a manual
+`testing/evidence/*.txt`, `Tests run: 25, Failures: 0, Errors: 0`) plus a manual
 pass against the real MySQL/XAMPP instance per `docs/SETUP.md` §7.
 
 ## Authentication
@@ -84,6 +84,17 @@ pass against the real MySQL/XAMPP instance per `docs/SETUP.md` §7.
 | DB-05 | DB | `vw_vehicle_utilization` counts only non-cancelled reservations | Cancel one reservation for a vehicle that also has a confirmed one | `times_booked` reflects only the confirmed booking | PASS |
 | DB-06 | DB | Foreign-key/CHECK constraints reject invalid rows | `INSERT INTO vehicles (..., status) VALUES (..., 'BROKEN')` | Rejected by `chk_vehicles_status` | PASS |
 
+## Staff Accounts (Admin: Edit Staff Details)
+
+| ID | Type | Description | Steps | Expected Result | Automated In | Status |
+|---|---|---|---|---|---|---|
+| USER-01 | POS | Admin edits a staff member's full name and email | PATCH `/api/users/{id}` with `{"fullName": "...", "email": "..."}`, logged in as `admin` | `200 OK`, response reflects the new name/email; `username`, `role` and password hash unchanged | `UserServiceImplTest.updatesFullNameAndEmail` | PASS |
+| USER-02 | NEG | Editing an unknown staff id returns 404 | PATCH `/api/users/999` | `404 Not Found` | `UserServiceImplTest.updateUnknownUserThrows` | PASS |
+| USER-03 | VAL | Blank full name is rejected | PATCH with `{"fullName": "", "email": "x@example.com"}` | `400 Bad Request`, `validationErrors.fullName` | Manual (Postman + live curl, `docs/SETUP.md`) | PASS |
+| USER-04 | VAL | Invalid email format is rejected | PATCH with `{"fullName": "X", "email": "not-an-email"}` | `400 Bad Request`, `validationErrors.email` | Manual (Postman) | PASS |
+| USER-05 | API | `STAFF` role cannot edit staff accounts (Admin-only) | Logged in as `kirisha` (STAFF), PATCH `/api/users/1` | `403 Forbidden` | Manual (Postman, role check; also verified live via curl) | PASS |
+| USER-06 | INT | End-to-end edit via the UI | Staff Accounts page &rarr; "Edit" on a row &rarr; change name/email &rarr; "Save Changes" | Modal closes, table refreshes with the new values, no page reload needed | Manual (screenshots `testing/screenshots/15-staff-accounts.png`, `16-edit-staff-modal.png`) | PASS |
+
 ## Cross-cutting API contract tests
 
 | ID | Type | Description | Steps | Expected Result | Automated In | Status |
@@ -94,6 +105,6 @@ pass against the real MySQL/XAMPP instance per `docs/SETUP.md` §7.
 
 ---
 
-**Total automated test methods: 23** (run via `./mvnw test`; see
+**Total automated test methods: 25** (run via `./mvnw test`; see
 `testing/evidence/` for the captured passing output and `TEST_PLAN.md` §4 for
 how each level of this matrix maps to a tool).

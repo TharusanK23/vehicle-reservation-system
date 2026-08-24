@@ -219,6 +219,51 @@
             "body": { "mode": "raw", "raw": "{\n  \"username\": \"staff3\",\n  \"password\": \"staff789\",\n  \"fullName\": \"Third Staff\",\n  \"email\": \"staff3@sunrisevehicles.lk\",\n  \"role\": \"STAFF\"\n}" },
             "url": "{{baseUrl}}/users"
           }
+        },
+        {
+          "name": "Update Staff Details - name & email (as Admin)",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"fullName\": \"Kirisha K. Perera\",\n  \"email\": \"kirisha.perera@sunrisevehicles.lk\"\n}" },
+            "url": "{{baseUrl}}/users/2"
+          }
+        },
+        {
+          "name": "Update Staff Details - Blank Name (expect 400)",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"fullName\": \"\",\n  \"email\": \"kirisha@sunrisevehicles.lk\"\n}" },
+            "url": "{{baseUrl}}/users/2"
+          }
+        },
+        {
+          "name": "Update Staff Details - Invalid Email (expect 400)",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"fullName\": \"Kirisha Fernando\",\n  \"email\": \"not-an-email\"\n}" },
+            "url": "{{baseUrl}}/users/2"
+          }
+        },
+        {
+          "name": "Update Staff Details As STAFF (expect 403)",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"fullName\": \"Hacked Name\",\n  \"email\": \"hacked@example.com\"\n}" },
+            "url": "{{baseUrl}}/users/1"
+          }
+        },
+        {
+          "name": "Update Staff Details - Unknown Id (expect 404)",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"fullName\": \"Nobody\",\n  \"email\": \"nobody@example.com\"\n}" },
+            "url": "{{baseUrl}}/users/999"
+          }
         }
       ]
     },
