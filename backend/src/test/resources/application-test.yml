@@ -1,0 +1,28 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:vehicle_reservation_test;DB_CLOSE_DELAY=-1;MODE=MySQL
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: ""
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.H2Dialect
+        format_sql: false
+    database-platform: org.hibernate.dialect.H2Dialect
+    show-sql: false
+
+app:
+  security:
+    jwt:
+      secret: "TestOnlySecretKeyForJwtSigningDuringAutomatedUnitAndIntegrationTests2026"
+      expiration-ms: 3600000
+      cookie-name: vrs_token
+  business:
+    tax-rate: 0.08
+    weekend-surcharge-rate: 0.10
+    long-term-discount-days: 7
+    long-term-discount-rate: 0.15
+    currency-symbol: "Rs."
