@@ -365,3 +365,30 @@ Option B of §2.2 (the `mysql.exe` CLI import) avoid Apache/PHP entirely.
    `apache_stop.bat` in the XAMPP root.
 3. To reset all data to the original seed state at any time, simply re-run
    §2.2 — `database/schema.sql` drops and recreates everything.
+
+---
+
+## 11. Regenerating the PDF report
+
+`docs/ASSIGNMENT_REPORT.pdf` is a committed, ready-to-submit export of
+`docs/ASSIGNMENT_REPORT.md`, already formatted to the brief's spec (A4,
+margins 1.5in/1in, 1.5 line spacing, Times New Roman, 14pt bold headings,
+12pt body, page numbers bottom-right) with every diagram and screenshot
+embedded. If you edit the report or capture new screenshots, regenerate it:
+
+```
+cd docs
+npm install        # first time only - installs marked + puppeteer-core
+node generate-pdf.js
+```
+
+Requires a local Chrome install (default path in `generate-pdf.js`; override
+with the `CHROME_PATH` environment variable if yours is elsewhere, e.g. Edge
+at `C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe`). This is a
+one-off documentation tool, not part of the running application - Node.js is
+not otherwise required anywhere in this project.
+
+To capture fresh screenshots first, log into the client at
+`http://localhost/vehicle-reservation-client/` (§5) and screenshot each page
+listed in `testing/screenshots/`, or automate it with a headless-browser
+script following the same pattern as `docs/generate-pdf.js`.
