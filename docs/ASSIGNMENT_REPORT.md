@@ -186,6 +186,31 @@ vehicle's calendar as a separate first-class concept. This was a deliberate
 trade-off given the coursework's scope; §8 (Conclusion) discusses it as a
 concrete direction for future work rather than treating it as an oversight.
 
+### 2.6 Program Flowchart
+
+The brief describes the target system as a *"menu driven application"*; the
+flowchart below (`diagrams/flowchart.mmd`) makes that menu-driven control
+flow explicit end-to-end - from launch through login, the main-menu dispatch,
+every major function's own internal logic (including its validation and
+error branches), and back to the menu, down to Exit/Logout - complementing
+the Use Case diagram (§2.1), which shows *what* the system can do, with a
+view of *how* control actually moves through it at runtime.
+
+![Program Flowchart](../diagrams/flowchart.png)
+
+Two structural decisions are worth explaining. First, every function branch
+(Register Reservation, Search, Calculate & Print Bill, fleet/staff
+management, Reports, Help) rejoins the same central **Main Menu** decision
+node rather than terminating - reflecting the actual implementation, where
+each frontend page keeps the shared navigation bar and no action is a
+dead end for the user. Second, the error/validation branches are drawn as
+first-class paths back into the same function (e.g. an availability
+conflict returns to date/vehicle selection, not to the main menu) rather
+than collapsed into a single generic "error" box, because that loop-back
+behaviour - retry within the same task rather than starting over - is
+precisely what the client's inline field-error rendering (§3.5) is designed
+to support.
+
 ---
 
 ## 3. Task B — Interactive System, Design Patterns & Architecture (40 marks)
@@ -215,15 +240,63 @@ application with web services"* substantively, not just nominally.
 
 The API exposes resources for authentication, customers, vehicle categories,
 vehicles (including an availability-search endpoint), reservations, bills,
-reports, staff-account administration, and a help endpoint — 9 controllers,
-documented fully via Swagger UI at `/swagger-ui.html` (see `docs/SETUP.md`
-§3). Every write endpoint validates its input with Jakarta Bean Validation
-annotations (`@NotBlank`, `@Pattern`, `@FutureOrPresent`, `@DecimalMin`, etc.)
-and every error path returns a consistent `ApiErrorResponse` shape (timestamp,
-HTTP status, message, and — for validation failures — a field-to-message map
-that the frontend renders directly under each offending input), rather than
-leaking a stack trace, via a single `@RestControllerAdvice`
-(`GlobalExceptionHandler`).
+reports, staff-account administration, a help endpoint, and a health check —
+**10 controllers**, 29 endpoints in total, documented fully via Swagger UI at
+`/swagger-ui.html` (see `docs/SETUP.md` §3). Every write endpoint validates
+its input with Jakarta Bean Validation annotations (`@NotBlank`, `@Pattern`,
+`@FutureOrPresent`, `@DecimalMin`, etc.) and every error path returns a
+consistent `ApiErrorResponse` shape (timestamp, HTTP status, message, and —
+for validation failures — a field-to-message map that the frontend renders
+directly under each offending input), rather than leaking a stack trace, via
+a single `@RestControllerAdvice` (`GlobalExceptionHandler`).
+
+#### 3.2.1 API documentation via Swagger / OpenAPI
+
+`springdoc-openapi` generates a full OpenAPI 3.0 specification from the
+controller/DTO annotations at startup, served interactively at
+`http://localhost:8081/swagger-ui/index.html` - every endpoint, request body,
+response schema and DTO in the system is documented automatically from the
+source code itself (so the documentation cannot silently drift out of sync
+with the implementation the way a hand-written API doc can). Three
+screenshots below, captured live against the running system, evidence this:
+
+![Swagger UI - full API surface: 10 controllers / 29 endpoints, and the generated schema list for every request/response DTO](../testing/screenshots/17-swagger-overview.png)
+
+The **overview** groups every endpoint by controller (`vehicle-controller`,
+`vehicle-category-controller`, `user-controller`, `reservation-controller`,
+`bill-controller`, `auth-controller`, `report-controller`, `help-controller`,
+`health-controller`, `customer-controller`), colour-coded by HTTP method
+(blue `GET`, green `POST`/`PATCH`, red `DELETE`) - a reader can see the whole
+resource model of the system at a glance, and the **Schemas** panel at the
+bottom lists every DTO (`RegisterReservationRequest`, `BillResponse`,
+`UpdateUserRequest`, etc.) with its exact field names and types.
+
+![POST /api/auth/login expanded - request body schema (username/password) and the 200 response schema (user + expiresInSeconds)](../testing/screenshots/18-swagger-login-endpoint.png)
+
+Expanding an individual operation (here, `POST /api/auth/login`) shows its
+full contract: the exact JSON shape the client must send (`Request body`),
+and every documented response - not just the happy path, since
+`GlobalExceptionHandler`'s `ApiErrorResponse` shape means every error
+response is equally well-typed and equally visible here.
+
+![Swagger's "Try it out" used to execute a real login request against the live backend - genuine 200 response with the authenticated admin user, request/response headers, and the equivalent curl command](../testing/screenshots/19-swagger-login-executed.png)
+
+Swagger UI is not only documentation - the **"Try it out"** button turns any
+operation into a live HTTP client. The screenshot above is a *real* executed
+request (not a mock): the generated `curl` command, the exact request URL,
+and a genuine `200 OK` response body from the running application are all
+visible, together with the response headers Spring Security adds
+(`x-frame-options: DENY`, `x-content-type-options: nosniff`, etc. - see
+§3.6). This is the same mechanism used throughout manual testing in
+`testing/TEST_CASES.md` as an alternative to Postman/curl.
+
+![POST /api/reservations expanded - the RegisterReservationRequest body (customer, vehicle, pickup/return date+time) and the start of the 201 ReservationResponse schema](../testing/screenshots/20-swagger-register-reservation-schema.png)
+
+The final screenshot shows a richer, nested DTO - `RegisterReservationRequest`
+- including the `LocalTime` sub-object shape (`hour`/`minute`/`second`/`nano`)
+that Jackson expects for `pickupTime`/`returnTime`, information a consumer of
+this API (a future mobile app, or a grader testing via Postman) would
+otherwise have to read the Java source to discover.
 
 ### 3.3 Design patterns (Task B ii)
 
@@ -477,7 +550,8 @@ logged in as `admin`, with real seeded data (2 reservations, 1 settled bill).
 
 ![Reports: daily revenue (stored procedure) and vehicle utilisation (view)](../testing/screenshots/08-reports.png)
 
-![Swagger / OpenAPI UI](../testing/screenshots/10-swagger-ui.png)
+(The interactive Swagger/OpenAPI UI is covered in its own dedicated
+subsection, §3.2.1, with four screenshots including a live executed request.)
 
 #### 3.7.1 Admin: editing staff details
 
