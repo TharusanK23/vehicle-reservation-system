@@ -10,6 +10,10 @@
 
     await loadUsers();
     document.getElementById("userForm").addEventListener("submit", createUser);
+    document.getElementById("editUserForm").addEventListener("submit", saveEditedUser);
+
+    const editModalEl = document.getElementById("editUserModal");
+    const editModal = new bootstrap.Modal(editModalEl);
 
     async function loadUsers() {
         try {
@@ -22,7 +26,10 @@
                     <td>${u.email}</td>
                     <td><span class="badge bg-secondary status-badge">${u.role}</span></td>
                     <td><span class="badge status-badge ${u.enabled !== false ? "bg-success" : "bg-secondary"}">${u.enabled !== false ? "Active" : "Disabled"}</span></td>
-                    <td><button class="btn btn-sm btn-outline-danger" data-id="${u.id}">Deactivate</button></td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-brand me-1" data-edit-id="${u.id}" data-full-name="${escapeAttr(u.fullName)}" data-email="${escapeAttr(u.email)}" data-username="${escapeAttr(u.username)}">Edit</button>
+                        <button class="btn btn-sm btn-outline-danger" data-id="${u.id}">Deactivate</button>
+                    </td>
                 </tr>`).join("");
 
             body.querySelectorAll("button[data-id]").forEach(btn => {
@@ -36,8 +43,54 @@
                     }
                 });
             });
+
+            body.querySelectorAll("button[data-edit-id]").forEach(btn => {
+                btn.addEventListener("click", () => openEditModal(btn.dataset));
+            });
         } catch (err) {
             showAlert("alertBox", "Could not load staff accounts.");
+        }
+    }
+
+    function escapeAttr(value) {
+        return String(value || "").replace(/&/g, "&amp;").replace(/"/g, "&quot;");
+    }
+
+    function openEditModal(data) {
+        document.querySelectorAll("#editUserForm .field-error").forEach(el => el.textContent = "");
+        clearAlert("editFormAlert");
+        document.getElementById("editUserId").value = data.editId;
+        document.getElementById("editUsername").value = data.username;
+        document.getElementById("editFullName").value = data.fullName;
+        document.getElementById("editEmail").value = data.email;
+        editModal.show();
+    }
+
+    async function saveEditedUser(e) {
+        e.preventDefault();
+        document.querySelectorAll("#editUserForm .field-error").forEach(el => el.textContent = "");
+        clearAlert("editFormAlert");
+
+        const id = document.getElementById("editUserId").value;
+        const payload = {
+            fullName: document.getElementById("editFullName").value.trim(),
+            email: document.getElementById("editEmail").value.trim()
+        };
+
+        try {
+            await Api.patch("/users/" + id, payload);
+            editModal.hide();
+            await loadUsers();
+        } catch (err) {
+            if (err.status === 400 && err.body.validationErrors) {
+                const fieldToInputId = { fullName: "editFullName", email: "editEmail" };
+                Object.entries(err.body.validationErrors).forEach(([field, message]) => {
+                    const el = document.getElementById("err-" + (fieldToInputId[field] || field));
+                    if (el) el.textContent = message;
+                });
+            } else {
+                showAlert("editFormAlert", (err.body && err.body.message) || "Could not update this staff account.");
+            }
         }
     }
 
