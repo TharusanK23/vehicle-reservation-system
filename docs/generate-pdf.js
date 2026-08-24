@@ -65,7 +65,7 @@ async function main() {
     margin-bottom: 8pt;
     page-break-after: avoid;
   }
-  h1 { font-size: 16pt; border-bottom: 1.5pt solid #0b3954; padding-bottom: 6pt; }
+  h1 { border-bottom: 1.5pt solid #0b3954; padding-bottom: 6pt; }
   p, li { text-align: justify; }
   a { color: #0b3954; }
   hr { border: none; border-top: 0.75pt solid #999; margin: 14pt 0; }

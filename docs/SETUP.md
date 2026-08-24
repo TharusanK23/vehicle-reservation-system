@@ -77,7 +77,7 @@ and `vw_vehicle_utilization`. `users` should contain 2 seeded accounts.
 | Username | Password | Role | Purpose |
 |---|---|---|---|
 | `admin` | `admin123` | ADMIN | Fleet, categories, staff accounts, all reports |
-| `staff1` | `staff123` | STAFF | Day-to-day reservation & billing operations |
+| `kirisha` | `Kirisha@123` | STAFF | Day-to-day reservation & billing operations |
 
 Passwords are stored as BCrypt hashes (`database/schema.sql`); they are never
 stored or transmitted in plain text.
@@ -181,7 +181,7 @@ page, e.g.:
 | Swagger / OpenAPI UI | `http://localhost:8081/swagger-ui.html` |
 | phpMyAdmin (optional) | `http://localhost/phpmyadmin` |
 
-Log in with `admin`/`admin123` or `staff1`/`staff123` (§2.4).
+Log in with `admin`/`admin123` or `kirisha`/`Kirisha@123` (§2.4).
 
 ---
 
@@ -200,7 +200,7 @@ default — just run the requests in order, or use "Run collection").
 ```bash
 # Login (saves the session cookie to cookies.txt)
 curl -c cookies.txt -H "Content-Type: application/json" \
-     -d '{"username":"staff1","password":"staff123"}' \
+     -d '{"username":"kirisha","password":"Kirisha@123"}' \
      http://localhost:8081/api/auth/login
 
 # List vehicles
@@ -229,7 +229,7 @@ the browser holds the auth cookie), then "Try it out" on any endpoint.
 
 1. **User Authentication (Login)** — Open the client; try an invalid password
    (expect a clear "Invalid username or password" message and a `401`); then
-   log in with `staff1`/`staff123`.
+   log in with `kirisha`/`Kirisha@123`.
 2. **Register New Appointment (Reservation)** — Dashboard → *+ New Reservation*.
    Fill in a new customer, choose a category, click *Check Availability*, pick a
    vehicle and dates, *Save*. Confirm the generated reservation number (`RES-…`)
@@ -253,7 +253,7 @@ the browser holds the auth cookie), then "Try it out" on any endpoint.
    the `sp_daily_revenue_report` stored procedure) and vehicle utilisation
    report (backed by the `vw_vehicle_utilization` view) both render.
 9. **Admin-only screens** — Log in as `admin`; confirm *Staff Accounts* is
-   visible and usable. Log in as `staff1`; confirm it is hidden, and that
+   visible and usable. Log in as `kirisha`; confirm it is hidden, and that
    directly calling `POST /api/users` as staff returns `403 Forbidden`.
 
 ---
@@ -368,25 +368,32 @@ Option B of §2.2 (the `mysql.exe` CLI import) avoid Apache/PHP entirely.
 
 ---
 
-## 11. Regenerating the PDF report
+## 11. Regenerating the PDF / Word report
 
-`docs/ASSIGNMENT_REPORT.pdf` is a committed, ready-to-submit export of
-`docs/ASSIGNMENT_REPORT.md`, already formatted to the brief's spec (A4,
-margins 1.5in/1in, 1.5 line spacing, Times New Roman, 14pt bold headings,
-12pt body, page numbers bottom-right) with every diagram and screenshot
-embedded. If you edit the report or capture new screenshots, regenerate it:
+`docs/ASSIGNMENT_REPORT.pdf` and `docs/ASSIGNMENT_REPORT.docx` are both
+committed, ready-to-submit exports of `docs/ASSIGNMENT_REPORT.md`, already
+formatted to the brief's spec (A4, margins 1.5in/1in, 1.5 line spacing,
+Times New Roman, 14pt bold headings, 12pt body, page numbers bottom-right)
+with every diagram and screenshot embedded. If you edit the report or
+capture new screenshots, regenerate one or both:
 
 ```
 cd docs
-npm install        # first time only - installs marked + puppeteer-core
-node generate-pdf.js
+npm install          # first time only - installs marked, puppeteer-core, docx
+node generate-pdf.js   # -> ASSIGNMENT_REPORT.pdf  (renders via headless Chrome)
+node generate-docx.js  # -> ASSIGNMENT_REPORT.docx (native Word document via the `docx` library)
 ```
 
-Requires a local Chrome install (default path in `generate-pdf.js`; override
-with the `CHROME_PATH` environment variable if yours is elsewhere, e.g. Edge
-at `C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe`). This is a
-one-off documentation tool, not part of the running application - Node.js is
-not otherwise required anywhere in this project.
+`generate-pdf.js` requires a local Chrome install (default path inside the
+script; override with the `CHROME_PATH` environment variable if yours is
+elsewhere, e.g. Edge at
+`C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe`).
+`generate-docx.js` has no such dependency - it parses the Markdown into a
+token tree (via `marked`'s lexer) and builds native Word paragraphs, tables
+and embedded images directly, so the `.docx` opens as a real Word document
+in Microsoft Word / LibreOffice / Google Docs, not an HTML file renamed.
+Both are one-off documentation tools, not part of the running application -
+Node.js is not otherwise required anywhere in this project.
 
 To capture fresh screenshots first, log into the client at
 `http://localhost/vehicle-reservation-client/` (§5) and screenshot each page

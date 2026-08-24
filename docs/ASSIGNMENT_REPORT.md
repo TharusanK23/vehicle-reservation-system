@@ -6,11 +6,13 @@
 **GitHub repository:** https://github.com/TharusanK23/vehicle-reservation-system
 
 > **Formatting note:** this Markdown file is the source of truth for the
-> report's content. A submission-ready PDF (`docs/ASSIGNMENT_REPORT.pdf`),
-> already formatted to the brief's spec (A4, margins 1.5in/1in, 1.5 line
-> spacing, Times New Roman, 14pt bold headings, 12pt body, page numbers
-> bottom-right) with every diagram and screenshot embedded below, is generated
-> directly from this file — see `docs/generate-pdf.js`.
+> report's content. Submission-ready exports - `docs/ASSIGNMENT_REPORT.pdf`
+> and `docs/ASSIGNMENT_REPORT.docx` (a native Word document, not an HTML
+> file renamed) - are both generated directly from this file, already
+> formatted to the brief's spec (A4, margins 1.5in/1in, 1.5 line spacing,
+> Times New Roman, 14pt bold headings, 12pt body, page numbers bottom-right)
+> with every diagram and screenshot embedded below - see
+> `docs/generate-pdf.js` / `docs/generate-docx.js`.
 
 ---
 
@@ -66,7 +68,7 @@ criteria (§6), an EDGE reflection (§7), and a conclusion (§8).
 ## 2. Task A — System Design with UML Diagrams (20 marks)
 
 Full-resolution diagrams are in `diagrams/*.png`, generated from version-
-controlled PlantUML source (`diagrams/*.puml`) so they can be regenerated and
+controlled Mermaid source (`diagrams/*.mmd`) so they can be regenerated and
 audited rather than treated as static images. `diagrams/README.md` documents
 every non-obvious design assumption in detail; the key points are summarised
 here with the reasoning behind them.
@@ -599,7 +601,8 @@ backend domain model and entities, security and authentication, design-pattern
 package, REST controllers, database schema, frontend client, automated tests,
 diagrams, documentation) rather than a single "initial commit" — with a
 `.gitignore` scoped correctly for a mixed Java/static-frontend project
-(excluding `target/`, IDE metadata, and the large `plantuml.jar` build tool,
+(excluding `target/`, IDE metadata, and the Node tooling used only to export
+this report to PDF/Word,
 while explicitly keeping the Maven Wrapper jar so the project remains fully
 self-bootstrapping for anyone who clones it).
 
@@ -611,7 +614,8 @@ Excellent-band criteria ask to see "demonstrated, along with the deployment of
 changes."
 
 The repository has been pushed to **https://github.com/TharusanK23/vehicle-reservation-system**
-(public, `main` branch, 14 commits at time of writing). The first push's CI
+(public, `main` branch - see the repository's commit history for the current
+count). The first push's CI
 run failed (an incorrect working-directory path in `ci.yml`, left in for one
 commit as genuine evidence rather than pre-polished) and was diagnosed and
 fixed in the very next commit, after which `Backend CI` went green — build,
@@ -633,7 +637,7 @@ history on GitHub rather than a one-off upload.
 | Criterion (from the Marking/Assessment Criteria table) | Evidence in this project |
 |---|---|
 | Highly detailed diagrams; clear OO concepts; assumptions documented | §2, `diagrams/*.png`, `diagrams/README.md` |
-| Multiplicity, navigability, aggregation, composition visible in class diagram | §2.2, `class-diagram.puml` |
+| Multiplicity, navigability, aggregation, composition visible in class diagram | §2.2, `class-diagram.mmd` |
 | `<<include>>`/`<<extend>>` used accurately, with reasoning | §2.1 |
 | Good justification, critical reflection, design fluency | §2.5, §3.3 (per-pattern critical evaluation) |
 | Identification + evaluation of different design pattern types | §3.3 (5 patterns + DAO, each with problem/implementation/evaluation) |
