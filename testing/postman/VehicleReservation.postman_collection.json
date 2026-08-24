@@ -1,0 +1,234 @@
+{
+  "info": {
+    "name": "Vehicle Reservation System API",
+    "description": "CIS6003 coursework - Online Vehicle Reservation System REST API. Run 'Auth > Login (Staff)' first; Postman's cookie jar then keeps every subsequent request authenticated automatically.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8081/api" },
+    { "key": "reservationNumber", "value": "RES-2026-000001" },
+    { "key": "billNumber", "value": "INV-2026-000001" }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Login (Staff)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"username\": \"staff1\",\n  \"password\": \"staff123\"\n}" },
+            "url": "{{baseUrl}}/auth/login"
+          }
+        },
+        {
+          "name": "Login (Admin)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"username\": \"admin\",\n  \"password\": \"admin123\"\n}" },
+            "url": "{{baseUrl}}/auth/login"
+          }
+        },
+        {
+          "name": "Login - Wrong Password (expect 401)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"username\": \"staff1\",\n  \"password\": \"wrong-password\"\n}" },
+            "url": "{{baseUrl}}/auth/login"
+          }
+        },
+        {
+          "name": "Login - Blank Fields (expect 400)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"username\": \"\",\n  \"password\": \"\"\n}" },
+            "url": "{{baseUrl}}/auth/login"
+          }
+        },
+        {
+          "name": "Current User (/me)",
+          "request": { "method": "GET", "url": "{{baseUrl}}/auth/me" }
+        },
+        {
+          "name": "Logout",
+          "request": { "method": "POST", "url": "{{baseUrl}}/auth/logout" }
+        },
+        {
+          "name": "Protected Endpoint Without Login (expect 401)",
+          "request": { "method": "GET", "url": "{{baseUrl}}/reservations" }
+        }
+      ]
+    },
+    {
+      "name": "Vehicle Categories",
+      "item": [
+        { "name": "List Categories", "request": { "method": "GET", "url": "{{baseUrl}}/vehicle-categories" } },
+        {
+          "name": "Create Category",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"categoryName\": \"Convertible\",\n  \"dailyRate\": 12000,\n  \"description\": \"Open-top vehicles for special occasions\"\n}" },
+            "url": "{{baseUrl}}/vehicle-categories"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Vehicles",
+      "item": [
+        { "name": "List Vehicles", "request": { "method": "GET", "url": "{{baseUrl}}/vehicles" } },
+        {
+          "name": "Available Vehicles (date range)",
+          "request": { "method": "GET", "url": "{{baseUrl}}/vehicles/available?pickupDate=2026-09-01&returnDate=2026-09-04" }
+        },
+        {
+          "name": "Create Vehicle",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"registrationNumber\": \"CBZ-9999\",\n  \"make\": \"Nissan\",\n  \"model\": \"Leaf\",\n  \"manufactureYear\": 2022,\n  \"categoryId\": 1\n}" },
+            "url": "{{baseUrl}}/vehicles"
+          }
+        },
+        {
+          "name": "Create Vehicle - Invalid Year (expect 400)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"registrationNumber\": \"CBZ-0001\",\n  \"make\": \"Test\",\n  \"model\": \"Test\",\n  \"manufactureYear\": 1800,\n  \"categoryId\": 1\n}" },
+            "url": "{{baseUrl}}/vehicles"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Reservations",
+      "item": [
+        { "name": "List Reservations", "request": { "method": "GET", "url": "{{baseUrl}}/reservations" } },
+        {
+          "name": "Register - New Customer",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customerFullName\": \"Kasun Fernando\",\n  \"customerAddress\": \"12 Galle Road, Colombo 03\",\n  \"customerContactNumber\": \"0771234567\",\n  \"customerEmail\": \"kasun@example.com\",\n  \"vehicleId\": 1,\n  \"pickupDate\": \"2026-09-01\",\n  \"pickupTime\": \"09:00:00\",\n  \"returnDate\": \"2026-09-04\",\n  \"returnTime\": \"09:00:00\"\n}"
+            },
+            "url": "{{baseUrl}}/reservations"
+          }
+        },
+        {
+          "name": "Register - Existing Customer",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customerId\": 1,\n  \"vehicleId\": 3,\n  \"pickupDate\": \"2026-09-10\",\n  \"pickupTime\": \"10:00:00\",\n  \"returnDate\": \"2026-09-12\",\n  \"returnTime\": \"10:00:00\"\n}"
+            },
+            "url": "{{baseUrl}}/reservations"
+          }
+        },
+        {
+          "name": "Register - Double Booking (expect 409)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customerFullName\": \"Another Person\",\n  \"customerAddress\": \"Kandy\",\n  \"customerContactNumber\": \"0759998888\",\n  \"vehicleId\": 1,\n  \"pickupDate\": \"2026-09-02\",\n  \"pickupTime\": \"09:00:00\",\n  \"returnDate\": \"2026-09-03\",\n  \"returnTime\": \"09:00:00\"\n}"
+            },
+            "url": "{{baseUrl}}/reservations"
+          }
+        },
+        {
+          "name": "Register - Invalid Contact Number (expect 400)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customerFullName\": \"Bad Data\",\n  \"customerAddress\": \"Colombo\",\n  \"customerContactNumber\": \"abc\",\n  \"vehicleId\": 4,\n  \"pickupDate\": \"2026-09-01\",\n  \"pickupTime\": \"09:00:00\",\n  \"returnDate\": \"2026-09-02\",\n  \"returnTime\": \"09:00:00\"\n}"
+            },
+            "url": "{{baseUrl}}/reservations"
+          }
+        },
+        {
+          "name": "Search Reservation by Number",
+          "request": { "method": "GET", "url": "{{baseUrl}}/reservations/{{reservationNumber}}" }
+        },
+        {
+          "name": "Search Reservation - Not Found (expect 404)",
+          "request": { "method": "GET", "url": "{{baseUrl}}/reservations/RES-2026-999999" }
+        },
+        {
+          "name": "Cancel Reservation",
+          "request": { "method": "POST", "url": "{{baseUrl}}/reservations/{{reservationNumber}}/cancel" }
+        }
+      ]
+    },
+    {
+      "name": "Bills",
+      "item": [
+        {
+          "name": "Generate / Fetch Bill",
+          "request": { "method": "GET", "url": "{{baseUrl}}/bills/reservation/{{reservationNumber}}" }
+        },
+        {
+          "name": "Settle Payment",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"paymentMethod\": \"Cash\"\n}" },
+            "url": "{{baseUrl}}/bills/{{billNumber}}/settle"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Reports",
+      "item": [
+        { "name": "Dashboard Summary", "request": { "method": "GET", "url": "{{baseUrl}}/reports/dashboard" } },
+        { "name": "Daily Revenue Report", "request": { "method": "GET", "url": "{{baseUrl}}/reports/revenue?from=2026-01-01&to=2026-12-31" } },
+        { "name": "Vehicle Utilisation Report", "request": { "method": "GET", "url": "{{baseUrl}}/reports/vehicle-utilization" } }
+      ]
+    },
+    {
+      "name": "Staff Accounts (Admin only)",
+      "item": [
+        { "name": "List Staff (as Admin)", "request": { "method": "GET", "url": "{{baseUrl}}/users" } },
+        {
+          "name": "Create Staff Account (as Admin)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"username\": \"staff2\",\n  \"password\": \"staff456\",\n  \"fullName\": \"Second Staff\",\n  \"email\": \"staff2@sunrisevehicles.lk\",\n  \"role\": \"STAFF\"\n}" },
+            "url": "{{baseUrl}}/users"
+          }
+        },
+        {
+          "name": "Create Staff Account As STAFF (expect 403)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"username\": \"staff3\",\n  \"password\": \"staff789\",\n  \"fullName\": \"Third Staff\",\n  \"email\": \"staff3@sunrisevehicles.lk\",\n  \"role\": \"STAFF\"\n}" },
+            "url": "{{baseUrl}}/users"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Misc",
+      "item": [
+        { "name": "Health Check (unauthenticated)", "request": { "method": "GET", "url": "{{baseUrl}}/health" } },
+        { "name": "Help Steps", "request": { "method": "GET", "url": "{{baseUrl}}/help" } },
+        { "name": "Customers List", "request": { "method": "GET", "url": "{{baseUrl}}/customers" } }
+      ]
+    }
+  ]
+}
