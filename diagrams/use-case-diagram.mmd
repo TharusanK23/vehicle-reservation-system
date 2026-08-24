@@ -28,6 +28,7 @@ flowchart LR
         UC9(["Manage Vehicle Categories & Rates"])
         UC10(["Manage Staff Accounts"])
         UC11(["View Decision-Support Reports"])
+        UC12(["Edit Staff Details<br/>(name &amp; email)"])
 
         UC2 -. "&laquo;include&raquo;" .-> UC2a
         UC2 -. "&laquo;include&raquo;" .-> UC2c
@@ -36,6 +37,7 @@ flowchart LR
         UC4 -. "&laquo;include&raquo;" .-> UC4d
         UC4b -. "&laquo;extend&raquo;\n(pickup is Fri/Sat/Sun)" .-> UC4a
         UC4c -. "&laquo;extend&raquo;\n(duration &ge; 7 days)" .-> UC4a
+        UC12 -. "&laquo;extend&raquo;\n(editing an existing account)" .-> UC10
     end
 
     Staff --- UC1
@@ -54,4 +56,4 @@ flowchart LR
     classDef actor fill:#0b3954,color:#fff,stroke:#0b3954;
     classDef usecase fill:#eef3f6,stroke:#0b3954,color:#0b3954;
     class Staff,Admin actor;
-    class UC1,UC2,UC2a,UC2b,UC2c,UC3,UC4,UC4a,UC4b,UC4c,UC4d,UC5,UC6,UC7,UC8,UC9,UC10,UC11 usecase;
+    class UC1,UC2,UC2a,UC2b,UC2c,UC3,UC4,UC4a,UC4b,UC4c,UC4d,UC5,UC6,UC7,UC8,UC9,UC10,UC11,UC12 usecase;
