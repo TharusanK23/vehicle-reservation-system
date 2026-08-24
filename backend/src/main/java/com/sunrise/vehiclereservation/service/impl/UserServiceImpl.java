@@ -1,6 +1,7 @@
 package com.sunrise.vehiclereservation.service.impl;
 
 import com.sunrise.vehiclereservation.dto.request.CreateUserRequest;
+import com.sunrise.vehiclereservation.dto.request.UpdateUserRequest;
 import com.sunrise.vehiclereservation.dto.response.UserResponse;
 import com.sunrise.vehiclereservation.entity.User;
 import com.sunrise.vehiclereservation.exception.DuplicateResourceException;
@@ -14,7 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-/** Administers staff accounts. Only an ADMIN may create or deactivate accounts (enforced in SecurityConfig / controller). */
+/** Administers staff accounts. Only an ADMIN may create, edit or deactivate accounts (enforced in SecurityConfig / controller). */
 @Service
 @Transactional
 public class UserServiceImpl implements UserService {
@@ -46,6 +47,15 @@ public class UserServiceImpl implements UserService {
                 .role(request.role())
                 .enabled(true)
                 .build();
+        return DtoMapper.toResponse(userRepository.save(user));
+    }
+
+    @Override
+    public UserResponse update(Long id, UpdateUserRequest request) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Staff account not found with id: " + id));
+        user.setFullName(request.fullName());
+        user.setEmail(request.email());
         return DtoMapper.toResponse(userRepository.save(user));
     }
 

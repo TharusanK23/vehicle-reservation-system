@@ -1,6 +1,7 @@
 package com.sunrise.vehiclereservation.controller;
 
 import com.sunrise.vehiclereservation.dto.request.CreateUserRequest;
+import com.sunrise.vehiclereservation.dto.request.UpdateUserRequest;
 import com.sunrise.vehiclereservation.dto.response.UserResponse;
 import com.sunrise.vehiclereservation.service.UserService;
 import jakarta.validation.Valid;
@@ -31,6 +32,11 @@ public class UserController {
     @ResponseStatus(HttpStatus.CREATED)
     public UserResponse create(@Valid @RequestBody CreateUserRequest request) {
         return userService.create(request);
+    }
+
+    @PatchMapping("/{id}")
+    public UserResponse update(@PathVariable Long id, @Valid @RequestBody UpdateUserRequest request) {
+        return userService.update(id, request);
     }
 
     @PatchMapping("/{id}/deactivate")
