@@ -35,7 +35,7 @@ class BillFactoryTest {
         VehicleCategory category = VehicleCategory.builder().id(1L).categoryName("SUV").dailyRate(BigDecimal.valueOf(9500)).build();
         Vehicle vehicle = Vehicle.builder().id(1L).registrationNumber("CBA-1122").make("Toyota").model("Prado").category(category).build();
         Customer customer = Customer.builder().id(1L).fullName("Ruwan Silva").build();
-        User staff = User.builder().id(1L).username("staff1").build();
+        User staff = User.builder().id(1L).username("kirisha").build();
 
         reservation = Reservation.builder()
                 .reservationNumber("RES-2026-000001")

@@ -57,7 +57,7 @@ class ReservationServiceImplTest {
         VehicleCategory category = VehicleCategory.builder().id(1L).categoryName("Economy").dailyRate(BigDecimal.valueOf(4500)).build();
         vehicle = Vehicle.builder().id(1L).registrationNumber("CAB-1234").make("Toyota").model("Aqua")
                 .category(category).status(VehicleStatus.AVAILABLE).build();
-        staff = User.builder().id(1L).username("staff1").build();
+        staff = User.builder().id(1L).username("kirisha").build();
 
         validRequest = new RegisterReservationRequest(
                 null, "Kasun Fernando", "Colombo 03", "0771234567", "kasun@example.com", null,
@@ -70,7 +70,7 @@ class ReservationServiceImplTest {
         when(vehicleRepository.findById(1L)).thenReturn(Optional.of(vehicle));
         when(reservationRepository.findOverlappingForVehicle(1L, validRequest.pickupDate(), validRequest.returnDate()))
                 .thenReturn(List.of());
-        when(userRepository.findByUsername("staff1")).thenReturn(Optional.of(staff));
+        when(userRepository.findByUsername("kirisha")).thenReturn(Optional.of(staff));
         when(customerRepository.save(any(Customer.class))).thenAnswer(inv -> {
             Customer c = inv.getArgument(0);
             c.setId(1L);
@@ -78,7 +78,7 @@ class ReservationServiceImplTest {
         });
         when(reservationRepository.save(any(Reservation.class))).thenAnswer(inv -> inv.getArgument(0));
 
-        ReservationResponse response = reservationService.register(validRequest, "staff1");
+        ReservationResponse response = reservationService.register(validRequest, "kirisha");
 
         assertThat(response.reservationNumber()).startsWith("RES-");
         assertThat(response.customer().fullName()).isEqualTo("Kasun Fernando");
@@ -92,7 +92,7 @@ class ReservationServiceImplTest {
         vehicle.setStatus(VehicleStatus.MAINTENANCE);
         when(vehicleRepository.findById(1L)).thenReturn(Optional.of(vehicle));
 
-        assertThatThrownBy(() -> reservationService.register(validRequest, "staff1"))
+        assertThatThrownBy(() -> reservationService.register(validRequest, "kirisha"))
                 .isInstanceOf(BusinessRuleException.class)
                 .hasMessageContaining("not available for booking");
 
@@ -107,7 +107,7 @@ class ReservationServiceImplTest {
         when(reservationRepository.findOverlappingForVehicle(1L, validRequest.pickupDate(), validRequest.returnDate()))
                 .thenReturn(List.of(existing));
 
-        assertThatThrownBy(() -> reservationService.register(validRequest, "staff1"))
+        assertThatThrownBy(() -> reservationService.register(validRequest, "kirisha"))
                 .isInstanceOf(BusinessRuleException.class)
                 .hasMessageContaining("already reserved");
 
@@ -121,7 +121,7 @@ class ReservationServiceImplTest {
                 null, null, null, null, null, null,
                 1L, LocalDate.of(2026, 3, 1), LocalTime.of(9, 0), LocalDate.of(2026, 3, 3), LocalTime.of(9, 0), null);
 
-        assertThatThrownBy(() -> reservationService.register(incomplete, "staff1"))
+        assertThatThrownBy(() -> reservationService.register(incomplete, "kirisha"))
                 .isInstanceOf(BusinessRuleException.class);
     }
 

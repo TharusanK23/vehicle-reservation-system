@@ -27,7 +27,7 @@ class ReservationBuilderTest {
         customer = Customer.builder().id(1L).fullName("Kasun Fernando").address("Colombo").contactNumber("0771234567").build();
         VehicleCategory category = VehicleCategory.builder().id(1L).categoryName("Economy").dailyRate(BigDecimal.valueOf(4500)).build();
         vehicle = Vehicle.builder().id(1L).registrationNumber("CAB-1234").make("Toyota").model("Aqua").manufactureYear(2019).category(category).build();
-        staff = User.builder().id(1L).username("staff1").build();
+        staff = User.builder().id(1L).username("kirisha").build();
     }
 
     @Test

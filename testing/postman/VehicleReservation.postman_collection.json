@@ -18,7 +18,7 @@
           "request": {
             "method": "POST",
             "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "body": { "mode": "raw", "raw": "{\n  \"username\": \"staff1\",\n  \"password\": \"staff123\"\n}" },
+            "body": { "mode": "raw", "raw": "{\n  \"username\": \"kirisha\",\n  \"password\": \"Kirisha@123\"\n}" },
             "url": "{{baseUrl}}/auth/login"
           }
         },
@@ -36,7 +36,7 @@
           "request": {
             "method": "POST",
             "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "body": { "mode": "raw", "raw": "{\n  \"username\": \"staff1\",\n  \"password\": \"wrong-password\"\n}" },
+            "body": { "mode": "raw", "raw": "{\n  \"username\": \"kirisha\",\n  \"password\": \"wrong-password\"\n}" },
             "url": "{{baseUrl}}/auth/login"
           }
         },

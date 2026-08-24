@@ -58,7 +58,7 @@ class ReservationFlowIntegrationTest {
     @BeforeEach
     void seedData() {
         userRepository.save(User.builder()
-                .username("staff1").password(passwordEncoder.encode("staff123"))
+                .username("kirisha").password(passwordEncoder.encode("Kirisha@123"))
                 .fullName("Test Staff").email("staff@test.local").role(Role.STAFF).enabled(true).build());
 
         VehicleCategory category = categoryRepository.save(VehicleCategory.builder()
@@ -72,7 +72,7 @@ class ReservationFlowIntegrationTest {
     @Test
     @DisplayName("End-to-end: login -> register reservation -> generate and fetch bill")
     void fullReservationAndBillingFlow() throws Exception {
-        Cookie authCookie = login("staff1", "staff123");
+        Cookie authCookie = login("kirisha", "Kirisha@123");
 
         String requestJson = objectMapper.writeValueAsString(Map.of(
                 "customerFullName", "Kasun Fernando",
@@ -111,7 +111,7 @@ class ReservationFlowIntegrationTest {
     @Test
     @DisplayName("Negative: login with an incorrect password is rejected with 401")
     void loginWithWrongPasswordIsRejected() throws Exception {
-        String requestJson = objectMapper.writeValueAsString(Map.of("username", "staff1", "password", "wrong-password"));
+        String requestJson = objectMapper.writeValueAsString(Map.of("username", "kirisha", "password", "wrong-password"));
 
         mockMvc.perform(post("/api/auth/login").contentType(MediaType.APPLICATION_JSON).content(requestJson))
                 .andExpect(status().isUnauthorized());
@@ -126,7 +126,7 @@ class ReservationFlowIntegrationTest {
     @Test
     @DisplayName("Negative: registering a reservation for a vehicle with an overlapping date range is rejected with 409")
     void doubleBookingIsRejectedByApi() throws Exception {
-        Cookie authCookie = login("staff1", "staff123");
+        Cookie authCookie = login("kirisha", "Kirisha@123");
 
         String requestJson = objectMapper.writeValueAsString(Map.of(
                 "customerFullName", "Kasun Fernando",

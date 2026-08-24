@@ -11,13 +11,13 @@ pass against the real MySQL/XAMPP instance per `docs/SETUP.md` §7.
 
 | ID | Type | Description | Steps | Expected Result | Automated In | Status |
 |---|---|---|---|---|---|---|
-| AUTH-01 | POS | Valid staff login succeeds | POST `/api/auth/login` with `staff1`/`staff123` | `200 OK`, user JSON + `vrs_token` HttpOnly cookie set | `ReservationFlowIntegrationTest.fullReservationAndBillingFlow` (via `login()` helper) | PASS |
-| AUTH-02 | NEG | Wrong password rejected | POST `/api/auth/login` with `staff1`/`wrong-password` | `401 Unauthorized` | `ReservationFlowIntegrationTest.loginWithWrongPasswordIsRejected` | PASS |
+| AUTH-01 | POS | Valid staff login succeeds | POST `/api/auth/login` with `kirisha`/`Kirisha@123` | `200 OK`, user JSON + `vrs_token` HttpOnly cookie set | `ReservationFlowIntegrationTest.fullReservationAndBillingFlow` (via `login()` helper) | PASS |
+| AUTH-02 | NEG | Wrong password rejected | POST `/api/auth/login` with `kirisha`/`wrong-password` | `401 Unauthorized` | `ReservationFlowIntegrationTest.loginWithWrongPasswordIsRejected` | PASS |
 | AUTH-03 | NEG | Unknown username rejected | POST `/api/auth/login` with a non-existent username | `401 Unauthorized` (no user enumeration - same message as AUTH-02) | Manual (Postman "Login - Unknown User") | PASS |
 | AUTH-04 | VAL | Blank username/password rejected | POST `/api/auth/login` with `{"username":"","password":""}` | `400 Bad Request` with `validationErrors.username`/`.password` | Manual (Postman) | PASS |
 | AUTH-05 | NEG | Protected endpoint rejects an anonymous request | GET `/api/reservations` with no cookie | `401 Unauthorized` | `ReservationFlowIntegrationTest.protectedEndpointRejectsAnonymousRequest` | PASS |
 | AUTH-06 | POS | Logout clears the session | POST `/api/auth/logout`, then GET `/api/auth/me` | `204` then `401` on the follow-up call | Manual (Postman sequence) | PASS |
-| AUTH-07 | API | `ADMIN`-only endpoint rejects `STAFF` | Logged in as `staff1`, POST `/api/users` | `403 Forbidden` | Manual (Postman, role check) | PASS |
+| AUTH-07 | API | `ADMIN`-only endpoint rejects `STAFF` | Logged in as `kirisha`, POST `/api/users` | `403 Forbidden` | Manual (Postman, role check) | PASS |
 
 ## Register New Reservation
 

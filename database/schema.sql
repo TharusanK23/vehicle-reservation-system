@@ -268,11 +268,11 @@ FROM reservations r
 -- -----------------------------------------------------------------------------
 
 -- Default staff accounts. Passwords are BCrypt-hashed (never store plain text).
---   admin / admin123   (ADMIN  - full access incl. fleet & staff management, all reports)
---   staff1 / staff123  (STAFF  - day-to-day booking & billing operations)
+--   admin    / admin123      (ADMIN  - full access incl. fleet & staff management, all reports)
+--   kirisha  / Kirisha@123   (STAFF  - day-to-day booking & billing operations)
 INSERT INTO users (username, password, full_name, email, role, enabled, created_at) VALUES
-    ('admin',  '$2b$10$7ADQs/tyhEp55w/XFyYAl.uewWgBwFgqiBXNvX5/yvliBicKzxJgS', 'System Administrator', 'admin@sunrisevehicles.lk',  'ADMIN', 1, NOW()),
-    ('staff1', '$2b$10$4pFWxXn1Xtpz0TfHEnwND.IzbYUyMBxwy/LNBO7Xdl3JDJ2k3UK22', 'Nimali Perera',         'nimali@sunrisevehicles.lk', 'STAFF', 1, NOW());
+    ('admin',   '$2b$10$7ADQs/tyhEp55w/XFyYAl.uewWgBwFgqiBXNvX5/yvliBicKzxJgS', 'System Administrator', 'admin@sunrisevehicles.lk',   'ADMIN', 1, NOW()),
+    ('kirisha', '$2b$10$Zl/Q23P7H.IqHsNeOHThmeYfG59HBBinpZye0JoImAhr00SqiX0XC', 'Kirisha Fernando',     'kirisha@sunrisevehicles.lk', 'STAFF', 1, NOW());
 
 INSERT INTO vehicle_categories (category_name, daily_rate, description) VALUES
     ('Economy', 4500.00, 'Compact, fuel-efficient cars ideal for city driving (e.g. Toyota Aqua, Suzuki Alto).'),
