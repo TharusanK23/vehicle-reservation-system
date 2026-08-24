@@ -1,0 +1,14 @@
+{
+  "name": "vehicle-reservation-report-tools",
+  "version": "1.0.0",
+  "private": true,
+  "description": "One-off tooling to export docs/ASSIGNMENT_REPORT.md to a brief-formatted docs/ASSIGNMENT_REPORT.pdf. Not part of the running application.",
+  "scripts": {
+    "build-pdf": "node generate-pdf.js"
+  },
+  "license": "UNLICENSED",
+  "dependencies": {
+    "marked": "^18.0.10",
+    "puppeteer-core": "^25.8.0"
+  }
+}

@@ -9,6 +9,10 @@ hs_err_pid*
 # PlantUML jar is a build tool, not source - re-download per diagrams/README.md instead of committing 22MB.
 diagrams/tools/
 
+# Node tooling used only to export docs/ASSIGNMENT_REPORT.md to PDF (docs/generate-pdf.js)
+docs/node_modules/
+docs/_report_render.tmp.html
+
 # IDE
 .idea/
 *.iml
